@@ -1,11 +1,8 @@
 import React from 'react';
-import MapView from 'react-native-maps';
-import { StyleSheet, View } from 'react-native';
+import { Redirect } from 'expo-router';
+
 
 export default function Page() {
-	return (
-		<View style={{ flex: 1 }}>
-			<MapView style={StyleSheet.absoluteFill} />
-		</View>
-	);
+	
+	return <Redirect href={"/(tabs)/Home"} />;
 }
