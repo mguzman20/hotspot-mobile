@@ -1,10 +1,22 @@
-import { View, Text, StyleSheet } from 'react-native';
-import Login from '@/app/Login';
+import { View, Text, StyleSheet, Button, Alert } from 'react-native';
+import { useAuth } from '../context/AuthContext';
+import { useRouter } from 'expo-router';
+
 
 export default function Tab() {
+  const { setAuthState } = useAuth();
+  const router = useRouter();
+
+
+  const handleLogout = () => {
+    setAuthState({ token: '', authenticated: false });
+    router.replace('/(tabs)/Home');
+    Alert.alert('Sucess', 'Logged Out!');
+  }
   return (
     <View style={styles.container}>
       <Text>Perfil</Text>
+      <Button title="Logout" onPress={handleLogout} />
     </View>
   );
 }

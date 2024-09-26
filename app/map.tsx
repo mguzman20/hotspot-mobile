@@ -1,5 +1,5 @@
 import React, {useRef, useState, useEffect} from 'react';
-import MapView, {Region, Camera} from 'react-native-maps';
+import MapView, {Region, Camera, PROVIDER_GOOGLE} from 'react-native-maps';
 import { StyleSheet, View } from 'react-native';
 
 export default function Page() {
@@ -77,7 +77,7 @@ export default function Page() {
 			region={region}
 			rotateEnabled={true}
         	onRegionChangeComplete={restrictMap}  // Restricción de movimientos y zoom
-			
+			provider={PROVIDER_GOOGLE}
 			/>
 		</View>
 	);
