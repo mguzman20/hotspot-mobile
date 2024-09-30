@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
+import { View, TextInput, Button, StyleSheet, Text, Alert, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 
@@ -27,6 +27,14 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  clickable: {
+    padding: 8,
+  },
+  clickableText: {
+    fontSize: 16,
+    alignSelf: 'center',
+    textDecorationLine: 'underline',
+  },
 });
 
 export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | 'signup') => void}) {
@@ -48,22 +56,23 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email,
+          email: email.trim(),
           password,
         }),
       });
 
       const data = await response.json();
       if (response.ok) {
-          const token = response.headers.get('auth-token');
-          setAuthState({ token, authenticated: true });
-          router.replace('/(tabs)/Home');
-          Alert.alert('Success', 'Login successful');
+        const token = response.headers.get('auth-token');
+        setAuthState({ token, authenticated: true });
+        router.replace('/(tabs)/Home');
+        Alert.alert('Success', 'Login successful');
       } else {
         Alert.alert('Error', data.message || 'Login failed');
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error(error)
     }
   };
 
@@ -91,11 +100,13 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
 
       <View style={{marginTop: 20}} />
 
-      <Button title="Login" onPress={handleLogin} />
+      <Button title="Log in" onPress={handleLogin} />
 
       <View style={{marginTop: 20}} />
 
-      <Button title="Signup" color='gray' onPress={() => setLoginPage('signup')}/>
+      <TouchableOpacity style={styles.clickable} onPress={() => setLoginPage('signup')}>
+        <Text style={styles.clickableText}>Signup instead</Text>
+      </TouchableOpacity>
     </View>
   );
 }
