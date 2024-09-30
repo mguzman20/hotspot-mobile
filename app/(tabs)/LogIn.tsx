@@ -1,18 +1,16 @@
-import { View, Text, StyleSheet } from 'react-native';
-import Login from '@/app/Login';
+import React, { useState } from 'react';
+import { View, StyleSheet, Text } from 'react-native';
+import LogInForm from '../pages/LogInForm';
+
+const styles = StyleSheet.create({
+
+});
 
 export default function Tab() {
+  const [loginPage, setLoginPage] = useState<'login' | 'signup'>('login')
   return (
-    <View style={styles.container}>
-      <Login/>
+    <View style={{flex: 1}}>
+      {loginPage == 'login' ? <LogInForm setLoginPage={setLoginPage} /> : <Text>hola</Text>}
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});

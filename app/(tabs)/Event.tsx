@@ -1,5 +1,4 @@
 import { View, Text, StyleSheet } from 'react-native';
-import Login from '@/app/Login';
 
 export default function Tab() {
   return (

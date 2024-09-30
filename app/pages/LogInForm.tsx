@@ -1,9 +1,35 @@
 import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert } from 'react-native';
-import { useAuth } from './context/AuthContext';
+import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 
-const LoginForm = () => {
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    padding: 50,
+  },
+  label: {
+    fontSize: 16,
+    marginBottom: 8,
+    fontWeight: 'bold',
+  },
+  input: {
+    height: 40,
+    borderColor: 'gray',
+    borderWidth: 1,
+    marginBottom: 12,
+    marginHorizontal: 0,
+    paddingHorizontal: 10,
+    borderRadius: 5,
+  },
+  button: {
+    marginTop: 20,
+  },
+});
+
+export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | 'signup') => void}) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setAuthState } = useAuth();
@@ -63,30 +89,13 @@ const LoginForm = () => {
         autoCapitalize="none"
       />
 
+      <View style={{marginTop: 20}} />
+
       <Button title="Login" onPress={handleLogin} />
+
+      <View style={{marginTop: 20}} />
+
+      <Button title="Signup" color='gray' onPress={() => setLoginPage('signup')}/>
     </View>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  label: {
-    fontSize: 16,
-    marginBottom: 8,
-    fontWeight: 'bold',
-  },
-  input: {
-    height: 40,
-    borderColor: 'gray',
-    borderWidth: 1,
-    marginBottom: 12,
-    paddingHorizontal: 10,
-    borderRadius: 5,
-  },
-});
-
-export default LoginForm;
+}
