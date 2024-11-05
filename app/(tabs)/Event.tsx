@@ -10,14 +10,14 @@ export default function Tab() {
     return (
         <NavigationContainer independent={true}>
             <Stack.Navigator initialRouteName="Events">
-                <Stack.Screen 
-                    name="Events" 
-                    component={Events} 
+                <Stack.Screen
+                    name="Events"
+                    component={Events}
                     options={{ title: 'Eventos' }}
                 />
-                <Stack.Screen 
-                    name="EventDetail" 
-                    component={EventDetail} 
+                <Stack.Screen
+                    name="EventDetail"
+                    component={EventDetail}
                     options={{ title: 'Detalle del Evento' }}
                 />
             </Stack.Navigator>
