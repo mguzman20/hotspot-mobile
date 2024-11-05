@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 'signup') => void}) {
+export default function SignUpForm({ setLoginPage }: { setLoginPage: (x: 'login' | 'signup') => void }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -52,12 +52,12 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
     if (!passwordRepeat) return Alert.alert('Error', 'Please enter your password twice');
 
     if (password !== passwordRepeat) {
-        Alert.alert('Error', "Passwords don't match!");
-        return;
+      Alert.alert('Error', "Passwords don't match!");
+      return;
     }
-    
+
     try {
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/api/user/register", {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -75,9 +75,11 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
         Alert.alert('Success', 'Account created successfully');
       } else {
         Alert.alert('Error', data.message || 'Signup failed');
+        console.error(data)
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error(error)
     }
   };
 
@@ -101,7 +103,7 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
@@ -111,7 +113,7 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
         secureTextEntry
         autoCapitalize="none"
       />
-      
+
       <Text style={styles.label}>Repeat password</Text>
       <TextInput
         style={styles.input}
@@ -122,11 +124,11 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
         autoCapitalize="none"
       />
 
-      <View style={{marginTop: 20}} />
+      <View style={{ marginTop: 20 }} />
 
       <Button title="Sign up" onPress={handleSignup} />
 
-      <View style={{marginTop: 20}} />
+      <View style={{ marginTop: 20 }} />
 
       <TouchableOpacity style={styles.clickable} onPress={() => setLoginPage('login')}>
         <Text style={styles.clickableText}>Already have an account? Log in</Text>
