@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl, TouchableOpacity, I
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
-import { CampusEvent, fetchEvents } from '../helpers/event';
+import { CampusEvent, fetchEvents } from '../helpers/backend';
 import { set } from 'react-hook-form';
 
 type RootStackParamList = {
@@ -16,7 +16,7 @@ type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
 export default function Events() {
     const navigation = useNavigation<EventsNavigationProp>();
     const [loading, setLoading] = useState(true);
-    const { authState, reloadEvents } = useAuth();
+    const { authState, reloadSpots: reloadEvents } = useAuth();
 
     useEffect(() => {
         reloadEvents().then(() => setLoading(false))

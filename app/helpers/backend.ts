@@ -42,3 +42,27 @@ export async function fetchEvents(token: string | null): Promise<CampusEvent[]> 
         return []
     }
 }
+
+export async function fetchLocations(token: string | null): Promise<CampusLocation[]> {
+    try {
+        const headers: any = {
+            'Content-Type': 'application/json',
+        }
+        if (token != null) {
+            headers['Authorization'] = 'Bearer ' + token
+        }
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
+            {
+                method: 'GET',
+                headers: headers,
+            }
+        );
+        if (!response.ok) throw new Error('Error al obtener los eventos');
+        const data: CampusLocation[] = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        Alert.alert('Hubo un problema al cargar las ubicaciones');
+        return []
+    }
+}

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, Image, Alert } from 'react-native';
-import { CampusEvent } from '../helpers/event';
+import { CampusEvent } from '../helpers/backend';
 import { useNavigation } from 'expo-router';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { useAuth } from '../context/AuthContext';

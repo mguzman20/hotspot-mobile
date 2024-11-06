@@ -31,7 +31,7 @@ export default function EventForm() {
     });
     const [open, setOpen] = useState(false);
     const router = useRouter();
-    const { authState, reloadEvents } = useAuth();
+    const { authState, reloadSpots: reloadEvents } = useAuth();
     const boundaries = {
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },

@@ -1,15 +1,18 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+import { ReactNode } from 'react';
+import { CampusEvent, CampusLocation, fetchEvents, fetchLocations } from '../helpers/backend';
 
 interface AuthState {
     authenticated: boolean;
     token: string | null;
     eventList: CampusEvent[];
+    locationList: CampusLocation[];
 }
 
 interface AuthProps {
     authState: AuthState;
     setAuthState: React.Dispatch<React.SetStateAction<AuthState>>;
-    reloadEvents: () => Promise<void>;
+    reloadSpots: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthProps>({
@@ -17,9 +20,10 @@ const AuthContext = createContext<AuthProps>({
         token: null,
         authenticated: false,
         eventList: [],
+        locationList: [],
     },
     setAuthState: () => { },
-    reloadEvents: async () => { },
+    reloadSpots: async () => { },
 });
 
 
@@ -27,26 +31,24 @@ export const useAuth = () => {
     return useContext(AuthContext)
 };
 
-import { ReactNode } from 'react';
-import { CampusEvent, fetchEvents } from '../helpers/event';
-
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [authState, setAuthState] = useState<AuthState>({
         token: null,
         authenticated: false,
         eventList: [],
+        locationList: [],
     });
 
-    const reloadEvents = async () => {
-        const evs = await fetchEvents(authState.token);
+    const reloadSpots = async () => {
+        const [evs, locs] = await Promise.all([fetchEvents(authState.token), fetchLocations(authState.token)])
         setAuthState(authState => {
-            return { ...authState, eventList: evs }
+            return { ...authState, eventList: evs, locationList: locs }
         })
     }
 
     return (
-        <AuthContext.Provider value={{ authState, setAuthState, reloadEvents }}>
+        <AuthContext.Provider value={{ authState, setAuthState, reloadSpots }}>
             {children}
         </AuthContext.Provider>
     );

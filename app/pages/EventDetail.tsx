@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, Image } from 'react-native';
-import { CampusEvent } from '../helpers/event';
+import { CampusEvent } from '../helpers/backend';
 
 export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
     if (route == null) return <></>

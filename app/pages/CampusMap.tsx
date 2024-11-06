@@ -5,7 +5,7 @@ import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native
 import { Stack } from 'expo-router';
 import * as Location from 'expo-location';
 import { useAuth } from '../context/AuthContext';
-import { CampusEvent, CampusSpot } from '../helpers/event';
+import { CampusEvent, CampusSpot } from '../helpers/backend';
 
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
@@ -13,7 +13,7 @@ export default function CampusMap() {
   const [filterCategory, setCategory] = useState<string>('all');
   const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const { authState, reloadEvents } = useAuth()
+  const { authState, reloadSpots: reloadEvents } = useAuth()
 
   const fetchEvents = async () => {
     const events = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
@@ -30,7 +30,7 @@ export default function CampusMap() {
   }, [authState.token])
 
   useEffect(() => {
-    let filtered = authState.eventList;
+    let filtered: CampusSpot[] = [...authState.eventList, ...authState.locationList];
     if (filterText.trim() !== '') {
       filtered = filtered.filter(event =>
         event.title.toLowerCase().includes(filterText.toLowerCase())
