@@ -33,10 +33,9 @@ export default function Events() {
                     }
                 }
             );
-            console.log(response);
             if (!response.ok) throw new Error('Error al obtener los eventos');
             const data: CampusEvent[] = await response.json();
-            setEvents(data);
+            // setEvents(data);
         } catch (error) {
             console.error(error);
             alert('Hubo un problema al cargar los eventos');
