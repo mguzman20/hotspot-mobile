@@ -82,6 +82,7 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');
+      console.error(error);
     }
   };
 

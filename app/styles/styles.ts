@@ -27,7 +27,7 @@ export const styles = StyleSheet.create({
       borderRadius: 5,
     },
     textArea: {
-      height: 100,
+      height: 80,
       backgroundColor: 'white',
       borderColor: 'gray',
       borderWidth: 1,
