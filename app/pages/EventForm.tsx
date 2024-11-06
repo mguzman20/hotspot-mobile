@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import MapView, { Marker } from 'react-native-maps';
@@ -9,6 +9,7 @@ import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -24,12 +25,13 @@ const formSchema = z.object({
 
 
 export default function EventForm() {
+    const navigation = useNavigation();
     const { control, handleSubmit, formState: { errors }, setValue } = useForm({
         resolver: zodResolver(formSchema),
     });
     const [open, setOpen] = useState(false);
     const router = useRouter();
-    const { authState } = useAuth();
+    const { authState, reloadEvents } = useAuth();
     const boundaries = {
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },
@@ -59,8 +61,10 @@ export default function EventForm() {
 
             if (response.ok) {
                 // Redirect to the event page
-                console.log('Event created successfully');
-                router.replace('/(tabs)/Event');
+                Alert.alert('Evento creado exitosamente');
+                console.log('created event', data);
+                navigation.goBack();
+                reloadEvents();
             } else {
                 // Display an error message
                 console.error('Failed to create event');

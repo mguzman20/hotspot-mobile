@@ -1,3 +1,4 @@
+import { Alert } from "react-native";
 
 export type CampusSpot = {
     coordinates: {
@@ -6,7 +7,7 @@ export type CampusSpot = {
     }
     title: string;
     description: string;
-    tags: string[];
+    category: string;
     img?: string;
 }
 
@@ -16,4 +17,28 @@ export type CampusEvent = CampusSpot & {
 
 export type CampusLocation = CampusSpot & {
     score: Number;
+}
+
+export async function fetchEvents(token: string | null): Promise<CampusEvent[]> {
+    try {
+        const headers: any = {
+            'Content-Type': 'application/json',
+        }
+        if (token != null) {
+            headers['Authorization'] = 'Bearer ' + token
+        }
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
+            {
+                method: 'GET',
+                headers: headers,
+            }
+        );
+        if (!response.ok) throw new Error('Error al obtener los eventos');
+        const data: CampusEvent[] = await response.json();
+        return data;
+    } catch (error) {
+        console.error(error);
+        Alert.alert('Hubo un problema al cargar los eventos');
+        return []
+    }
 }

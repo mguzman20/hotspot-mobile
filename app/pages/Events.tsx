@@ -78,7 +78,7 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
-import { CampusEvent } from '../helpers/event';
+import { CampusEvent, fetchEvents } from '../helpers/event';
 
 type RootStackParamList = {
     Events: undefined;
@@ -89,34 +89,11 @@ type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
 
 export default function Events() {
     const navigation = useNavigation<EventsNavigationProp>();
-    const [events, setEvents] = useState<CampusEvent[]>([]);
     const [loading, setLoading] = useState(true);
-    const { authState } = useAuth();
+    const { authState, reloadEvents } = useAuth();
 
     useEffect(() => {
-        const fetchEvents = async () => {
-            try {
-                const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
-                    {
-                        method: 'GET',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'Authorization': 'Bearer ' + authState.token,
-                        }
-                    }
-                );
-                if (!response.ok) throw new Error('Error al obtener los eventos');
-                const data: CampusEvent[] = await response.json();
-                setEvents(data);
-            } catch (error) {
-                console.error(error);
-                alert('Hubo un problema al cargar los eventos');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchEvents();
+        reloadEvents().then(() => setLoading(false))
     }, [authState.token]);
 
     const handleCardPress = (event: CampusEvent) => {
@@ -127,7 +104,7 @@ export default function Events() {
 
     return (
         <ScrollView style={styles.container}>
-            {events.map((event, index) => (
+            {authState.eventList.map((event, index) => (
                 <TouchableOpacity key={index} onPress={() => handleCardPress(event)}>
                     <View style={styles.card}>
                         <Image
@@ -138,7 +115,7 @@ export default function Events() {
                             resizeMode="cover"
                         />
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{event.tags.join(' ')}</Text>
+                        <Text style={styles.eventCategory}>{event.category}</Text>
                     </View>
                 </TouchableOpacity>
             ))}

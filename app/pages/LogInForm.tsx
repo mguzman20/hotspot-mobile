@@ -64,7 +64,7 @@ export default function LogInForm({ setLoginPage }: { setLoginPage: (x: 'login' 
       const data = await response.json();
       if (response.ok) {
         const token = response.headers.get('auth-token');
-        setAuthState({ token, authenticated: true });
+        setAuthState(authState => { return { ...authState, token, authenticated: true } });
         router.replace('/(tabs)/Home');
         Alert.alert('Success', 'Login successful');
       } else {

@@ -16,11 +16,11 @@ export default function CampusMap() {
   const { authState } = useAuth()
 
   const spots: CampusSpot[] = [
-    { coordinates: { latitude: -33.495314, longitude: -70.604986 }, title: "Helao", tags: ['Comida'], description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.495714, longitude: -70.605286 }, title: "Pizza", tags: ['Comida'], description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.496714, longitude: -70.605286 }, title: 'Pizzas', tags: ['Comida'], description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.495714, longitude: -70.604286 }, title: 'Evento B', tags: ['Charla'], description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.496714, longitude: -70.604286 }, title: 'Evento C', tags: ['Concierto'], description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.495314, longitude: -70.604986 }, title: "Helao", category: 'Comida', description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.495714, longitude: -70.605286 }, title: "Pizza", category: 'Comida', description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.496714, longitude: -70.605286 }, title: 'Pizzas', category: 'Comida', description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.495714, longitude: -70.604286 }, title: 'Evento B', category: 'Charla', description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.496714, longitude: -70.604286 }, title: 'Evento C', category: 'Concierto', description: 'lorem ipsum dolor ett' },
   ];
 
   const fetchEvents = async () => {
@@ -45,7 +45,7 @@ export default function CampusMap() {
       );
     }
     if (category !== 'all') {
-      filtered = filtered.filter(event => event.tags.some(tag => tag === category));
+      filtered = filtered.filter(event => event.category === category);
     }
     setFilteredEvents(filtered);
   }, [filterText, category]);
@@ -124,7 +124,7 @@ export default function CampusMap() {
             key={index}
             coordinate={event.coordinates}
             title={event.title}
-            description={'Categoria: ' + event.tags.join(' ')}
+            description={'Categoria: ' + event.category}
           />
         ))}
       </MapView>

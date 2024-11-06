@@ -16,7 +16,7 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
                 resizeMode="cover"
             />
             <Text style={styles.eventName}>{event.title}</Text>
-            <Text style={styles.eventCategory}>Categoría: {event.tags.join(' ')}</Text>
+            <Text style={styles.eventCategory}>Categoría: {event.category}</Text>
             <Text style={styles.eventLocation}>Ubicación: {event.coordinates.latitude}, {event.coordinates.longitude}</Text>
             <Text style={styles.eventDescription}>Descripción: {event.description}</Text>
         </ScrollView>

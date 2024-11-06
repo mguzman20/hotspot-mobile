@@ -1,19 +1,25 @@
-import { createContext, useContext, useEffect, useState} from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
+
+interface AuthState {
+    authenticated: boolean;
+    token: string | null;
+    eventList: CampusEvent[];
+}
 
 interface AuthProps {
-    authState: {token: string | null; authenticated: boolean };
-    setAuthState: React.Dispatch<React.SetStateAction<{
-        token: string | null;
-        authenticated: boolean;
-      }>>;
+    authState: AuthState;
+    setAuthState: React.Dispatch<React.SetStateAction<AuthState>>;
+    reloadEvents: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthProps>({
     authState: {
         token: null,
-        authenticated: false
+        authenticated: false,
+        eventList: [],
     },
-    setAuthState: () => {}
+    setAuthState: () => { },
+    reloadEvents: async () => { },
 });
 
 
@@ -22,22 +28,28 @@ export const useAuth = () => {
 };
 
 import { ReactNode } from 'react';
+import { CampusEvent, fetchEvents } from '../helpers/event';
 
 
-export const AuthProvider = ({children}: {children: ReactNode}) => {
-    const [authState, setAuthState] = useState<{
-        token: string | null;
-        authenticated: boolean;
-    }>({
+export const AuthProvider = ({ children }: { children: ReactNode }) => {
+    const [authState, setAuthState] = useState<AuthState>({
         token: null,
-        authenticated: false
+        authenticated: false,
+        eventList: [],
     });
 
+    const reloadEvents = async () => {
+        const evs = await fetchEvents(authState.token);
+        setAuthState(authState => {
+            return { ...authState, eventList: evs }
+        })
+    }
+
     return (
-        <AuthContext.Provider value={ { authState, setAuthState }}>
-          {children}
+        <AuthContext.Provider value={{ authState, setAuthState, reloadEvents }}>
+            {children}
         </AuthContext.Provider>
-      );
+    );
 }
 
 export default AuthProvider;
