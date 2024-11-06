@@ -3,7 +3,7 @@ import { View, TextInput, Button, StyleSheet, Text, Alert, TouchableOpacity } fr
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: 'center',
@@ -14,6 +14,10 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 8,
     fontWeight: 'bold',
+  },
+  error: {
+    color: 'red',
+    marginBottom: 8,
   },
   input: {
     height: 40,
