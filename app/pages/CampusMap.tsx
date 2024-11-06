@@ -10,18 +10,10 @@ import { CampusEvent, CampusSpot } from '../helpers/event';
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
   const [filterText, setFilterText] = useState<string>('');
-  const [category, setCategory] = useState<string>('all');
+  const [filterCategory, setCategory] = useState<string>('all');
   const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
-  const { authState } = useAuth()
-
-  const spots: CampusSpot[] = [
-    { coordinates: { latitude: -33.495314, longitude: -70.604986 }, title: "Helao", category: 'Comida', description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.495714, longitude: -70.605286 }, title: "Pizza", category: 'Comida', description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.496714, longitude: -70.605286 }, title: 'Pizzas', category: 'Comida', description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.495714, longitude: -70.604286 }, title: 'Evento B', category: 'Charla', description: 'lorem ipsum dolor ett' },
-    { coordinates: { latitude: -33.496714, longitude: -70.604286 }, title: 'Evento C', category: 'Concierto', description: 'lorem ipsum dolor ett' },
-  ];
+  const { authState, reloadEvents } = useAuth()
 
   const fetchEvents = async () => {
     const events = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
@@ -34,21 +26,21 @@ export default function CampusMap() {
   }
 
   useEffect(() => {
-    fetchEvents()
+    reloadEvents()
   }, [authState.token])
 
   useEffect(() => {
-    let filtered = spots;
+    let filtered = authState.eventList;
     if (filterText.trim() !== '') {
       filtered = filtered.filter(event =>
         event.title.toLowerCase().includes(filterText.toLowerCase())
       );
     }
-    if (category !== 'all') {
-      filtered = filtered.filter(event => event.category === category);
+    if (filterCategory !== 'all') {
+      filtered = filtered.filter(event => event.category === filterCategory);
     }
     setFilteredEvents(filtered);
-  }, [filterText, category]);
+  }, [filterText, filterCategory, authState.eventList]);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
