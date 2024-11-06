@@ -7,6 +7,8 @@ import MapView, { Marker } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
+import { useRouter } from 'expo-router';
+import { useAuth } from '../context/AuthContext';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -26,7 +28,8 @@ export default function EventForm() {
         resolver: zodResolver(formSchema),
     });
     const [open, setOpen] = useState(false);
-
+    const router = useRouter();
+    const { authState } = useAuth();
     const boundaries = {
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },
@@ -39,24 +42,47 @@ export default function EventForm() {
         longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = async (data: any) => {
         console.log(data);
+
+        // Send the data to the API
+
+        try {
+            const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authState.token}`,
+                },
+                body: JSON.stringify(data),
+            });
+
+            if (response.ok) {
+                // Redirect to the event page
+                console.log('Event created successfully');
+                router.replace('/(tabs)/Event');
+            } else {
+                // Display an error message
+                console.error('Failed to create event');
+                const error = await response.json();
+                console.error(error);
+            };
+        } catch (error) {
+            console.error('Failed to create event');
+            console.error(error);
+        }
+        
     };
 
     // Handle the map press to set coordinates
-    const onMapPress = (e: any) => {
-        const { latitude, longitude } = e.nativeEvent.coordinate;
-        setRegion((prevState) => ({
-            ...prevState,
-            latitude,
-            longitude,
-        }));
+    const onRegionChangeComplete = (newRegion: {latitude: number, longitude: number, latitudeDelta: number, longitudeDelta:number}) => {
+        setRegion(newRegion);
         // Update the coordinates in the form
-        setValue('coordinates', { latitude, longitude });
+        setValue('coordinates', { latitude: newRegion.latitude, longitude: newRegion.longitude });
     };
+    
 
     return (
-        <ScrollView >
         <View style={styles.container}>
             <Text style={styles.label}>Titulo</Text>
             <Controller
@@ -124,15 +150,14 @@ export default function EventForm() {
                     marginVertical: 10,
                 }}
                 region={region}
-                onRegionChangeComplete={setRegion}
-                onPress={onMapPress}
+                onRegionChangeComplete={onRegionChangeComplete}
                 showsUserLocation={true}  // Handle map press event to set coordinates
             >
                 <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
             </MapView>
+            {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
 
             <Button title="Submit" onPress={handleSubmit(onSubmit)} />
         </View>
-        </ScrollView>
     );
 }
