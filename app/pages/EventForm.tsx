@@ -129,6 +129,7 @@ export default function EventForm() {
                                 { label: 'Tecnologia', value: 'Tecnologia' },
                                 { label: 'Salud', value: 'Salud' },
                             ]}
+                            listMode="SCROLLVIEW"
                             value={value}
                             placeholder='Selecciona una categoría'
                             containerStyle={styles.dropdownContainer}
