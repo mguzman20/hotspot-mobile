@@ -77,13 +77,14 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useAuth } from '../context/AuthContext';
 
 type Event = {
     coordinate: {
         latitude: number;
         longitude: number;
     };
-    name: string;
+    title: string;
     category: string;
     description: string;
     img: string | null;
@@ -100,11 +101,20 @@ export default function Events() {
     const navigation = useNavigation<EventsNavigationProp>();
     const [events, setEvents] = useState<Event[]>([]);
     const [loading, setLoading] = useState(true);
+    const { authState } = useAuth();
 
     useEffect(() => {
         const fetchEvents = async () => {
             try {
-                const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events/");
+                const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
+                    {
+                        method: 'GET',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': 'Bearer ' + authState.token,
+                        }
+                    }
+                );
                 if (!response.ok) throw new Error('Error al obtener los eventos');
                 const data: Event[] = await response.json();
                 setEvents(data);
@@ -137,7 +147,7 @@ export default function Events() {
                             }}
                             resizeMode="cover"
                         />
-                        <Text style={styles.eventName}>{event.name}</Text>
+                        <Text style={styles.eventName}>{event.title}</Text>
                         <Text style={styles.eventCategory}>{event.category}</Text>
                     </View>
                 </TouchableOpacity>
