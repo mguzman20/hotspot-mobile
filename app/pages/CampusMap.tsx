@@ -1,40 +1,51 @@
 import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Modal } from 'react-native';
-import {Picker} from '@react-native-picker/picker';
+import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
 import { Stack } from 'expo-router';
 import * as Location from 'expo-location';
-
-interface CampusEvent {
-  coordinate: { latitude: number, longitude: number };
-  name: string;
-  category: string;
-}
+import { useAuth } from '../context/AuthContext';
+import { CampusEvent, CampusSpot } from '../helpers/event';
 
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
   const [filterText, setFilterText] = useState<string>('');
   const [category, setCategory] = useState<string>('all');
-  const [filteredEvents, setFilteredEvents] = useState<CampusEvent[]>([]);
+  const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const { authState } = useAuth()
 
-  const events: CampusEvent[] = [
-    {coordinate: { latitude: -33.495314, longitude: -70.604986 }, name: "Helao", category: 'Comida'},
-    {coordinate: { latitude: -33.495714, longitude: -70.605286 }, name: "Pizza", category: 'Comida'},
-    { coordinate: { latitude: -33.496714, longitude: -70.605286 }, name: 'Pizzas', category: 'Comida' },
-    { coordinate: { latitude: -33.495714, longitude: -70.604286 }, name: 'Evento B', category: 'Charla' },
-    { coordinate: { latitude: -33.496714, longitude: -70.604286 }, name: 'Evento C', category: 'Concierto' },
+  const spots: CampusSpot[] = [
+    { coordinates: { latitude: -33.495314, longitude: -70.604986 }, title: "Helao", tags: ['Comida'], description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.495714, longitude: -70.605286 }, title: "Pizza", tags: ['Comida'], description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.496714, longitude: -70.605286 }, title: 'Pizzas', tags: ['Comida'], description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.495714, longitude: -70.604286 }, title: 'Evento B', tags: ['Charla'], description: 'lorem ipsum dolor ett' },
+    { coordinates: { latitude: -33.496714, longitude: -70.604286 }, title: 'Evento C', tags: ['Concierto'], description: 'lorem ipsum dolor ett' },
   ];
 
+  const fetchEvents = async () => {
+    const events = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
+      headers: {
+        'Auth-Token': authState.token ?? '',
+      }
+    })
+    const data = await events.json()
+    console.log(data)
+  }
+
   useEffect(() => {
-    let filtered = events;
+    fetchEvents()
+  }, [authState.token])
+
+  useEffect(() => {
+    let filtered = spots;
     if (filterText.trim() !== '') {
       filtered = filtered.filter(event =>
-        event.name.toLowerCase().includes(filterText.toLowerCase())
+        event.title.toLowerCase().includes(filterText.toLowerCase())
       );
     }
     if (category !== 'all') {
-      filtered = filtered.filter(event => event.category === category);
+      filtered = filtered.filter(event => event.tags.some(tag => tag === category));
     }
     setFilteredEvents(filtered);
   }, [filterText, category]);
@@ -111,9 +122,9 @@ export default function CampusMap() {
         {filteredEvents.map((event, index) => (
           <Marker
             key={index}
-            coordinate={event.coordinate}
-            title={event.name}
-            description={'Categoria: '+ event.category}
+            coordinate={event.coordinates}
+            title={event.title}
+            description={'Categoria: ' + event.tags.join(' ')}
           />
         ))}
       </MapView>

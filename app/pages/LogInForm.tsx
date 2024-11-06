@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   },
 });
 
-export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | 'signup') => void}) {
+export default function LogInForm({ setLoginPage }: { setLoginPage: (x: 'login' | 'signup') => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { setAuthState } = useAuth();
@@ -48,9 +48,9 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
       Alert.alert('Error', 'Please enter both email and password');
       return;
     }
-    
+
     try {
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/login", {
+      const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
         keyboardType="email-address"
         autoCapitalize="none"
       />
-      
+
       <Text style={styles.label}>Password</Text>
       <TextInput
         style={styles.input}
@@ -98,11 +98,11 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
         autoCapitalize="none"
       />
 
-      <View style={{marginTop: 20}} />
+      <View style={{ marginTop: 20 }} />
 
       <Button title="Log in" onPress={handleLogin} />
 
-      <View style={{marginTop: 20}} />
+      <View style={{ marginTop: 20 }} />
 
       <TouchableOpacity style={styles.clickable} onPress={() => setLoginPage('signup')}>
         <Text style={styles.clickableText}>Signup instead</Text>
