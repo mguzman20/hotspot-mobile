@@ -150,7 +150,12 @@ export default function CampusMap() {
             coordinate={event.coordinates}
             title={event.title}
             description={'Categoria: ' + capitalize(event.category)}
-          />
+            onSelect={() => {
+
+            }}
+          >
+            <FontAwesome name="map-marker" size={40} color={'date' in event ? "green" : "blue"} />
+          </Marker>
         ))}
       </MapView>
       <View style={styles.posIcon}>
