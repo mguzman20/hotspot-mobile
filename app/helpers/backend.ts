@@ -51,7 +51,7 @@ export async function fetchLocations(token: string | null): Promise<CampusLocati
         if (token != null) {
             headers['Authorization'] = 'Bearer ' + token
         }
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/locations",
             {
                 method: 'GET',
                 headers: headers,
