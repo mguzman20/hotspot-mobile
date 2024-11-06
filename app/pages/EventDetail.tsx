@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, Image } from 'react-native';
 import { CampusEvent } from '../helpers/backend';
+import { capitalize } from '../helpers/util';
 
 export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
     if (route == null) return <></>
@@ -16,7 +17,7 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
                 resizeMode="cover"
             />
             <Text style={styles.eventName}>{event.title}</Text>
-            <Text style={styles.eventCategory}>Categoría: {event.category}</Text>
+            <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
             <Text style={styles.eventLocation}>Ubicación: {event.coordinates.latitude}, {event.coordinates.longitude}</Text>
             <Text style={styles.eventDescription}>Descripción: {event.description}</Text>
         </ScrollView>

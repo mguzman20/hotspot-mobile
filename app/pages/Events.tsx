@@ -5,6 +5,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import { CampusEvent, fetchEvents } from '../helpers/backend';
 import { set } from 'react-hook-form';
+import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
     Events: undefined;
@@ -75,7 +76,7 @@ export default function Events() {
                             resizeMode="cover"
                         />
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{event.category}</Text>
+                        <Text style={styles.eventCategory}>{capitalize(event.category)}</Text>
                     </View>
                 </TouchableOpacity>
             ))}

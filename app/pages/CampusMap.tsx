@@ -142,7 +142,7 @@ export default function CampusMap() {
             key={index}
             coordinate={event.coordinates}
             title={event.title}
-            description={'Categoria: ' + event.category}
+            description={'Categoria: ' + capitalize(event.category)}
           />
         ))}
       </MapView>
@@ -151,9 +151,9 @@ export default function CampusMap() {
       </View>
       {/* Show only if location was granted */}
       {userLocation && (
-              <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
-              <FontAwesome name="crosshairs" size={24} color="white" />
-            </TouchableOpacity>
+        <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
+          <FontAwesome name="crosshairs" size={24} color="white" />
+        </TouchableOpacity>
       )}
       <TouchableOpacity style={styles.plusButton} onPress={() => console.log('Agregar una location nuevo')}>
         <FontAwesome name="plus" size={24} color="white" />
@@ -214,7 +214,7 @@ const styles = StyleSheet.create({
   plusButton: {
     position: 'absolute',
     bottom: 30,
-    right: 30,    
+    right: 30,
     backgroundColor: '#007bff',
     borderRadius: 25,
     padding: 15,
@@ -224,7 +224,7 @@ const styles = StyleSheet.create({
   centerIcon: {
     position: 'absolute',
     bottom: 100,
-    right: 30,    
+    right: 30,
     backgroundColor: 'black',
     borderRadius: 25,
     padding: 15,
