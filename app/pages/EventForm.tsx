@@ -1,5 +1,5 @@
 
-import React, {useState} from 'react';
+import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
@@ -71,93 +71,95 @@ export default function EventForm() {
             console.error('Failed to create event');
             console.error(error);
         }
-        
+
     };
 
     // Handle the map press to set coordinates
-    const onRegionChangeComplete = (newRegion: {latitude: number, longitude: number, latitudeDelta: number, longitudeDelta:number}) => {
+    const onRegionChangeComplete = (newRegion: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
         setRegion(newRegion);
         // Update the coordinates in the form
         setValue('coordinates', { latitude: newRegion.latitude, longitude: newRegion.longitude });
     };
-    
+
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.label}>Titulo</Text>
-            <Controller
-                control={control}
-                name="title"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                        style={styles.input}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                    />
-                )}
-            />
-            {errors.title?.message && <Text style={styles.error}>{String(errors.title.message)}</Text>}
+        <ScrollView>
+            <View style={styles.container}>
+                <Text style={styles.label}>Titulo</Text>
+                <Controller
+                    control={control}
+                    name="title"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            style={styles.input}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                        />
+                    )}
+                />
+                {errors.title?.message && <Text style={styles.error}>{String(errors.title.message)}</Text>}
 
-            <Text style={styles.label}>Descripción</Text>
-            <Controller
-                control={control}
-                name="description"
-                render={({ field: { onChange, onBlur, value } }) => (
-                    <TextInput
-                        style={styles.textArea}
-                        onBlur={onBlur}
-                        onChangeText={onChange}
-                        value={value}
-                        multiline
-                    />
-                )}
-            />
-            {errors.description && <Text style={styles.error}>{String(errors.description.message)}</Text>}
+                <Text style={styles.label}>Descripción</Text>
+                <Controller
+                    control={control}
+                    name="description"
+                    render={({ field: { onChange, onBlur, value } }) => (
+                        <TextInput
+                            style={styles.textArea}
+                            onBlur={onBlur}
+                            onChangeText={onChange}
+                            value={value}
+                            multiline
+                        />
+                    )}
+                />
+                {errors.description && <Text style={styles.error}>{String(errors.description.message)}</Text>}
 
-            <Text style={styles.label}>Categoria</Text>
-            <Controller
-                control={control}
-                name="category"
-                render={({ field: { onChange, value } }) => (
-                    <DropDownPicker
-                        items={[
-                            { label: 'Entretenimiento', value: 'Entretenimiento' },
-                            { label: 'Politica', value: 'Politica' },
-                            { label: 'Deporte', value: 'Deporte' },
-                            { label: 'Tecnologia', value: 'Tecnologia' },
-                            { label: 'Salud', value: 'Salud' },
-                        ]}
-                        value={value}
-                        placeholder='Selecciona una categoría'
-                        containerStyle={styles.dropdownContainer}
-                        style={styles.dropdown}
-                        setValue={onChange}
-                        multiple={false}
-                        onChangeValue={onChange}
-                        open={open}
-                        setOpen={setOpen}
-                    />
-                )}
-            />
-            {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
+                <Text style={styles.label}>Categoria</Text>
+                <Controller
+                    control={control}
+                    name="category"
+                    render={({ field: { onChange, value } }) => (
+                        <DropDownPicker
+                            items={[
+                                { label: 'Entretenimiento', value: 'Entretenimiento' },
+                                { label: 'Politica', value: 'Politica' },
+                                { label: 'Deporte', value: 'Deporte' },
+                                { label: 'Tecnologia', value: 'Tecnologia' },
+                                { label: 'Salud', value: 'Salud' },
+                            ]}
+                            value={value}
+                            placeholder='Selecciona una categoría'
+                            containerStyle={styles.dropdownContainer}
+                            style={styles.dropdown}
+                            setValue={onChange}
+                            multiple={false}
+                            onChangeValue={onChange}
+                            open={open}
+                            setOpen={setOpen}
+                        />
+                    )}
+                />
+                {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
 
-            <Text style={styles.label}>Ubicacion</Text>
-            <MapView
-                style={{
-                    width: '100%',
-                    height: 300,
-                    marginVertical: 10,
-                }}
-                region={region}
-                onRegionChangeComplete={onRegionChangeComplete}
-                showsUserLocation={true}  // Handle map press event to set coordinates
-            >
-                <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
-            </MapView>
-            {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
+                <Text style={styles.label}>Ubicacion</Text>
+                <MapView
+                    style={{
+                        width: '100%',
+                        height: 300,
+                        marginVertical: 10,
+                    }}
+                    region={region}
+                    onRegionChangeComplete={onRegionChangeComplete}
+                    showsUserLocation={true}  // Handle map press event to set coordinates
+                >
+                    <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+                </MapView>
+                {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
 
-            <Button title="Submit" onPress={handleSubmit(onSubmit)} />
-        </View>
+                <Button title="Submit" onPress={handleSubmit(onSubmit)} />
+            </View>
+        </ScrollView>
     );
 }
