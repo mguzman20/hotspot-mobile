@@ -50,7 +50,7 @@ export default function LogInForm({setLoginPage}: {setLoginPage: (x: 'login' | '
     }
     
     try {
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/api/user/login", {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/login", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

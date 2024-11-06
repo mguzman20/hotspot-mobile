@@ -61,7 +61,7 @@ export default function SignUpForm({setLoginPage}: {setLoginPage: (x: 'login' | 
     }
     
     try {
-        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/api/user/register", {
+        const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/register", {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
