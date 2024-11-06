@@ -1,13 +1,20 @@
 import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Modal } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region } from 'react-native-maps';
-import { Stack } from 'expo-router';
+import { useNavigation } from '@react-navigation/native';
+import {  StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
+type RootStackParamList = {
+  LocationForm: undefined;
+  Map: undefined;
+};
+
+type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Map'>;
 
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
@@ -16,6 +23,8 @@ export default function CampusMap() {
   const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { authState, reloadSpots: reloadEvents } = useAuth()
+  const navigation = useNavigation<EventsNavigationProp>();
+
 
   const fetchEvents = async () => {
     const events = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
@@ -91,72 +100,72 @@ export default function CampusMap() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.filterContainer}>
-        <TouchableOpacity style={styles.button} onPress={toggleModal}>
-          <Text style={styles.buttonText}>Categorías</Text>
-        </TouchableOpacity>
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Filtrar eventos por nombre"
-          value={filterText}
-          onChangeText={setFilterText}
-        />
-      </View>
-      <Modal
-        visible={isModalVisible}
-        transparent={true}
-        animationType="slide"
-        onRequestClose={toggleModal}
-      >
-        <View style={styles.modalContainer}>
-          <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('all')}>
-            <Text>Todos</Text>
-          </TouchableOpacity>
-          {
-            CATEGORIES.map(id => (
-              <TouchableOpacity key={id} style={styles.modalOption} onPress={() => selectCategory(id)}>
-                <Text>{capitalize(id)}</Text>
+        <View style={styles.container}>
+          <View style={styles.filterContainer}>
+            <TouchableOpacity style={styles.button} onPress={toggleModal}>
+              <Text style={styles.buttonText}>Categorías</Text>
+            </TouchableOpacity>
+            <TextInput
+              style={[styles.input, { flex: 1 }]}
+              placeholder="Filtrar eventos por nombre"
+              value={filterText}
+              onChangeText={setFilterText}
+            />
+          </View>
+          <Modal
+            visible={isModalVisible}
+            transparent={true}
+            animationType="slide"
+            onRequestClose={toggleModal}
+          >
+            <View style={styles.modalContainer}>
+              <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('all')}>
+                <Text>Todos</Text>
               </TouchableOpacity>
-            ))
-          }
+              {
+                CATEGORIES.map(id => (
+                  <TouchableOpacity key={id} style={styles.modalOption} onPress={() => selectCategory(id)}>
+                    <Text>{capitalize(id)}</Text>
+                  </TouchableOpacity>
+                ))
+              }
 
+            </View>
+          </Modal>
+          <MapView
+            ref={mapRef}
+            initialRegion={{
+              latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
+              longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
+              latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
+              longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude,
+            }}
+            style={styles.map}
+            provider={Platform.OS === 'ios' ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
+            showsUserLocation={true}
+          >
+            {filteredEvents.map((event, index) => (
+              <Marker
+                key={index}
+                coordinate={event.coordinates}
+                title={event.title}
+                description={'Categoria: ' + capitalize(event.category)}
+              />
+            ))}
+          </MapView>
+          <View style={styles.posIcon}>
+            <FontAwesome name="map-marker" size={40} color="red" />
+          </View>
+          {/* Show only if location was granted */}
+          {userLocation && (
+            <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
+              <FontAwesome name="crosshairs" size={24} color="white" />
+            </TouchableOpacity>
+          )}
+          <TouchableOpacity style={styles.plusButton} onPress={() => navigation.navigate("LocationForm")}>
+            <FontAwesome name="plus" size={24} color="white" />
+          </TouchableOpacity>
         </View>
-      </Modal>
-      <MapView
-        ref={mapRef}
-        initialRegion={{
-          latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
-          longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
-          latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
-          longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude,
-        }}
-        style={styles.map}
-        provider={Platform.OS === 'ios' ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
-        showsUserLocation={true}
-      >
-        {filteredEvents.map((event, index) => (
-          <Marker
-            key={index}
-            coordinate={event.coordinates}
-            title={event.title}
-            description={'Categoria: ' + capitalize(event.category)}
-          />
-        ))}
-      </MapView>
-      <View style={styles.posIcon}>
-        <FontAwesome name="map-marker" size={40} color="red" />
-      </View>
-      {/* Show only if location was granted */}
-      {userLocation && (
-        <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
-          <FontAwesome name="crosshairs" size={24} color="white" />
-        </TouchableOpacity>
-      )}
-      <TouchableOpacity style={styles.plusButton} onPress={() => console.log('Agregar una location nuevo')}>
-        <FontAwesome name="plus" size={24} color="white" />
-      </TouchableOpacity>
-    </View>
   );
 }
 
