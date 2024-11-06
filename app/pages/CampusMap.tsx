@@ -66,13 +66,11 @@ export default function CampusMap() {
 
 
   const requestLocation = async () => {
-    requestLocationPermission()
+    const { status } = await Location.requestForegroundPermissionsAsync();
     if (mapRef.current) {
       mapRef.current.setMapBoundaries(boundaries.northEast, boundaries.southWest)
     }
-    requestLocation()
     if (locationStatus?.status !== 'granted') {
-      console.log('Permission to access location was denied');
       return;
     }
     const location = await Location.getCurrentPositionAsync({});
@@ -235,7 +233,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: '50%',
     left: '50%',
-    marginLeft: -20, // Ajusta la posición horizontal del icono
+    marginLeft: -10, // Ajusta la posición horizontal del icono
     marginTop: -40,  // Ajusta la posición vertical del icono
     zIndex: 3,
   },
