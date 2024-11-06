@@ -9,6 +9,7 @@ import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
+import { CATEGORIES } from '../helpers/backend';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -17,13 +18,13 @@ const formSchema = z.object({
     }),
     title: z.string().min(0, { message: 'El título debe tener al menos 6 caracteres' }).max(255, { message: 'El título debe tener 255 caracteres o menos' }),
     description: z.string().min(0, { message: 'La descripción debe tener al menos 6 caracteres' }).max(1024, { message: 'La descripción debe tener 1024 caracteres o menos' }),
-    category: z.enum(['Entretenimiento', 'Politica', 'Deporte', 'Tecnologia', 'Salud'], {
-        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: entretenimiento, política, deportes, tecnología, salud.' }),
+    category: z.enum(CATEGORIES, {
+        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: baño, estudio, comida, sala, charla, concierto.'}),
     }),
 });
 
 
-export default function EventForm() {
+export default function LocationForm() {
     const { control, handleSubmit, formState: { errors }, setValue } = useForm({
         resolver: zodResolver(formSchema),
     });
@@ -48,7 +49,7 @@ export default function EventForm() {
         // Send the data to the API
 
         try {
-            const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
+            const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/locations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -59,16 +60,16 @@ export default function EventForm() {
 
             if (response.ok) {
                 // Redirect to the event page
-                console.log('Event created successfully');
+                console.log('Location created successfully');
                 router.replace('/(tabs)/Event');
             } else {
                 // Display an error message
-                console.error('Failed to create event');
+                console.error('Failed to create location');
                 const error = await response.json();
                 console.error(error);
             };
         } catch (error) {
-            console.error('Failed to create event');
+            console.error('Failed to create location');
             console.error(error);
         }
 
