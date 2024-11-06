@@ -1,11 +1,10 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
-import { View } from 'react-native';
-import AntDesign from '@expo/vector-icons/AntDesign';
 import Events from '../pages/Events';
 import EventDetail from '../pages/EventDetail';
 import EventForm from '../pages/EventForm';
+import AddEventButton from '../pages/AddEventButton';
 
 const Stack = createStackNavigator();
 
@@ -19,13 +18,7 @@ export default function Tab() {
                     options={({ navigation }) => ({
                         title: 'Eventos',
                         headerRight: () => (
-                            <AntDesign
-                                style={{ marginRight: 15 }}
-                                name="pluscircleo"
-                                size={24}
-                                color="black"
-                                onPress={() => navigation.navigate('EventForm')}
-                            />
+                            <AddEventButton navigation={navigation} />
                         ),
                     })}
                 />
