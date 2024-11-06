@@ -22,6 +22,27 @@ export default function Events() {
         reloadEvents().then(() => setLoading(false))
     }, [authState.token]);
 
+    const fetchEvents = async () => {
+        try {
+            const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/events",
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                }
+            );
+            if (!response.ok) throw new Error('Error al obtener los eventos');
+            const data: CampusEvent[] = await response.json();
+            // setEvents(data);
+        } catch (error) {
+            console.error(error);
+            alert('Hubo un problema al cargar los eventos');
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handleCardPress = (event: CampusEvent) => {
         navigation.navigate('EventDetail', { event });
     };

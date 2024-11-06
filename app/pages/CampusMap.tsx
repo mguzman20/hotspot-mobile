@@ -1,11 +1,12 @@
 import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Modal } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region } from 'react-native-maps';
 import { Stack } from 'expo-router';
 import * as Location from 'expo-location';
+import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 import { CampusEvent, CampusSpot } from '../helpers/backend';
+
 
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
@@ -22,7 +23,7 @@ export default function CampusMap() {
       }
     })
     const data = await events.json()
-    console.log(data)
+    // console.log(data)
   }
 
   useEffect(() => {
@@ -51,7 +52,8 @@ export default function CampusMap() {
     setIsModalVisible(false);
   };
 
-  const [locationStatus, requestLocation] = Location.useForegroundPermissions()
+  const [locationStatus, requestLocationPermission] = Location.useForegroundPermissions()
+  const [userLocation, setUserLocation] = useState<Region | null>(null);
 
   const boundaries = {
     northEast: { latitude: -33.495314, longitude: -70.604986 },
@@ -59,11 +61,35 @@ export default function CampusMap() {
   }
 
   useEffect(() => {
+    requestLocation();
+  }, [])
+
+
+  const requestLocation = async () => {
+    requestLocationPermission()
     if (mapRef.current) {
       mapRef.current.setMapBoundaries(boundaries.northEast, boundaries.southWest)
     }
     requestLocation()
-  }, [])
+    if (locationStatus?.status !== 'granted') {
+      console.log('Permission to access location was denied');
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    const region = {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+      latitudeDelta: 0.01,
+      longitudeDelta: 0.01,
+    };
+
+    setUserLocation(region)
+  }
+  const centerMapOnUserLocation = () => {
+    if (mapRef.current && userLocation) {
+      mapRef.current.animateToRegion(userLocation, 1000); // 1000 ms para una transición suave
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -120,6 +146,18 @@ export default function CampusMap() {
           />
         ))}
       </MapView>
+      <View style={styles.posIcon}>
+        <FontAwesome name="map-marker" size={40} color="red" />
+      </View>
+      {/* Show only if location was granted */}
+      {userLocation && (
+              <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
+              <FontAwesome name="crosshairs" size={24} color="white" />
+            </TouchableOpacity>
+      )}
+      <TouchableOpacity style={styles.plusButton} onPress={() => console.log('Agregar una location nuevo')}>
+        <FontAwesome name="plus" size={24} color="white" />
+      </TouchableOpacity>
     </View>
   );
 }
@@ -172,5 +210,33 @@ const styles = StyleSheet.create({
     padding: 15,
     marginVertical: 5,
     borderRadius: 5,
+  },
+  plusButton: {
+    position: 'absolute',
+    bottom: 30,
+    right: 30,    
+    backgroundColor: '#007bff',
+    borderRadius: 25,
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  centerIcon: {
+    position: 'absolute',
+    bottom: 100,
+    right: 30,    
+    backgroundColor: 'black',
+    borderRadius: 25,
+    padding: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  posIcon: {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    marginLeft: -20, // Ajusta la posición horizontal del icono
+    marginTop: -40,  // Ajusta la posición vertical del icono
+    zIndex: 3,
   },
 });
