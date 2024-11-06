@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import MapView, { Marker } from 'react-native-maps';
@@ -9,7 +9,9 @@ import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
+import { capitalize } from '../helpers/util';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -19,18 +21,19 @@ const formSchema = z.object({
     title: z.string().min(0, { message: 'El título debe tener al menos 6 caracteres' }).max(255, { message: 'El título debe tener 255 caracteres o menos' }),
     description: z.string().min(0, { message: 'La descripción debe tener al menos 6 caracteres' }).max(1024, { message: 'La descripción debe tener 1024 caracteres o menos' }),
     category: z.enum(CATEGORIES, {
-        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: baño, estudio, comida, sala, charla, concierto.'}),
+        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: ' + CATEGORIES.join(', ') + '.' }),
     }),
 });
 
 
 export default function LocationForm() {
+    const navigation = useNavigation();
     const { control, handleSubmit, formState: { errors }, setValue } = useForm({
         resolver: zodResolver(formSchema),
     });
     const [open, setOpen] = useState(false);
     const router = useRouter();
-    const { authState } = useAuth();
+    const { authState, reloadSpots } = useAuth();
     const boundaries = {
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },
@@ -60,8 +63,10 @@ export default function LocationForm() {
 
             if (response.ok) {
                 // Redirect to the event page
-                console.log('Location created successfully');
-                router.replace('/(tabs)/Event');
+                Alert.alert('Ubicación creada exitosamente');
+                console.log('created location', data);
+                navigation.goBack();
+                reloadSpots();
             } else {
                 // Display an error message
                 console.error('Failed to create location');
@@ -123,13 +128,10 @@ export default function LocationForm() {
                     name="category"
                     render={({ field: { onChange, value } }) => (
                         <DropDownPicker
-                            items={[
-                                { label: 'Entretenimiento', value: 'Entretenimiento' },
-                                { label: 'Politica', value: 'Politica' },
-                                { label: 'Deporte', value: 'Deporte' },
-                                { label: 'Tecnologia', value: 'Tecnologia' },
-                                { label: 'Salud', value: 'Salud' },
-                            ]}
+                            items={
+                                CATEGORIES.map(id => { return { label: capitalize(id), value: id } })
+                            }
+                            listMode="SCROLLVIEW"
                             value={value}
                             placeholder='Selecciona una categoría'
                             containerStyle={styles.dropdownContainer}

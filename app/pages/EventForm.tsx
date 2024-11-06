@@ -33,7 +33,7 @@ export default function EventForm() {
     });
     const [open, setOpen] = useState(false);
     const router = useRouter();
-    const { authState, reloadSpots: reloadEvents } = useAuth();
+    const { authState, reloadSpots } = useAuth();
     const boundaries = {
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },
@@ -66,7 +66,7 @@ export default function EventForm() {
                 Alert.alert('Evento creado exitosamente');
                 console.log('created event', data);
                 navigation.goBack();
-                reloadEvents();
+                reloadSpots();
             } else {
                 // Display an error message
                 console.error('Failed to create event');
