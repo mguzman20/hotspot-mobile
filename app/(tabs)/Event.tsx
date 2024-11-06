@@ -13,25 +13,25 @@ export default function Tab() {
     return (
         <NavigationContainer independent={true}>
             <Stack.Navigator initialRouteName="Events">
-                <Stack.Screen 
-                    name="Events" 
-                    component={Events} 
+                <Stack.Screen
+                    name="Events"
+                    component={Events}
                     options={({ navigation }) => ({
                         title: 'Eventos',
                         headerRight: () => (
-                                <AntDesign
-                                    style={{ marginRight: 15 }}
-                                    name="pluscircleo" 
-                                    size={24} 
-                                    color="black"
-                                    onPress={() => navigation.navigate('EventForm')}
-                                />
+                            <AntDesign
+                                style={{ marginRight: 15 }}
+                                name="pluscircleo"
+                                size={24}
+                                color="black"
+                                onPress={() => navigation.navigate('EventForm')}
+                            />
                         ),
                     })}
                 />
-                <Stack.Screen 
-                    name="EventDetail" 
-                    component={EventDetail} 
+                <Stack.Screen
+                    name="EventDetail"
+                    component={EventDetail}
                     options={{ title: 'Detalle del Evento' }}
                 />
                 <Stack.Screen

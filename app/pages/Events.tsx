@@ -78,28 +78,18 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
-
-type Event = {
-    coordinate: {
-        latitude: number;
-        longitude: number;
-    };
-    title: string;
-    category: string;
-    description: string;
-    img: string | null;
-};
+import { CampusEvent } from '../helpers/event';
 
 type RootStackParamList = {
     Events: undefined;
-    EventDetail: { event: Event };
+    EventDetail: { event: CampusEvent };
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
 
 export default function Events() {
     const navigation = useNavigation<EventsNavigationProp>();
-    const [events, setEvents] = useState<Event[]>([]);
+    const [events, setEvents] = useState<CampusEvent[]>([]);
     const [loading, setLoading] = useState(true);
     const { authState } = useAuth();
 
@@ -116,7 +106,7 @@ export default function Events() {
                     }
                 );
                 if (!response.ok) throw new Error('Error al obtener los eventos');
-                const data: Event[] = await response.json();
+                const data: CampusEvent[] = await response.json();
                 setEvents(data);
             } catch (error) {
                 console.error(error);
@@ -127,9 +117,9 @@ export default function Events() {
         };
 
         fetchEvents();
-    }, []);
+    }, [authState.token]);
 
-    const handleCardPress = (event: Event) => {
+    const handleCardPress = (event: CampusEvent) => {
         navigation.navigate('EventDetail', { event });
     };
 
@@ -143,12 +133,12 @@ export default function Events() {
                         <Image
                             style={styles.imagePlaceholder}
                             source={{
-                                uri: event.img || 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
+                                uri: event.img ? event.img : 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
                             }}
                             resizeMode="cover"
                         />
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{event.category}</Text>
+                        <Text style={styles.eventCategory}>{event.tags.join(' ')}</Text>
                     </View>
                 </TouchableOpacity>
             ))}

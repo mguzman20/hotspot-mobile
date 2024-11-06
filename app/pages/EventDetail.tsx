@@ -1,18 +1,9 @@
 import React from 'react';
 import { View, Text, StyleSheet, Dimensions, ScrollView, Image } from 'react-native';
+import { CampusEvent } from '../helpers/event';
 
-type Event = {
-    coordinate: {
-        latitude: number;
-        longitude: number;
-    };
-    name: string;
-    category: string;
-    description: string;
-    img: string | null;
-};
-
-export default function EventDetail({route}) {
+export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
+    if (route == null) return <></>
     const { event } = route.params;
 
     return (
@@ -24,9 +15,9 @@ export default function EventDetail({route}) {
                 }}
                 resizeMode="cover"
             />
-            <Text style={styles.eventName}>{event.name}</Text>
-            <Text style={styles.eventCategory}>Categoría: {event.category}</Text>
-            <Text style={styles.eventLocation}>Ubicación: {event.coordinate.latitude}, {event.coordinate.longitude}</Text>
+            <Text style={styles.eventName}>{event.title}</Text>
+            <Text style={styles.eventCategory}>Categoría: {event.tags.join(' ')}</Text>
+            <Text style={styles.eventLocation}>Ubicación: {event.coordinates.latitude}, {event.coordinates.longitude}</Text>
             <Text style={styles.eventDescription}>Descripción: {event.description}</Text>
         </ScrollView>
     );
