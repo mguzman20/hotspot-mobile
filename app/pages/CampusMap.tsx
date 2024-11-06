@@ -5,7 +5,8 @@ import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT } from 'react-native
 import { Stack } from 'expo-router';
 import * as Location from 'expo-location';
 import { useAuth } from '../context/AuthContext';
-import { CampusEvent, CampusSpot } from '../helpers/backend';
+import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
+import { capitalize } from '../helpers/util';
 
 export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
@@ -88,15 +89,14 @@ export default function CampusMap() {
           <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('all')}>
             <Text>Todos</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('Comida')}>
-            <Text>Comida</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('Charla')}>
-            <Text>Charla</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.modalOption} onPress={() => selectCategory('Concierto')}>
-            <Text>Concierto</Text>
-          </TouchableOpacity>
+          {
+            CATEGORIES.map(id => (
+              <TouchableOpacity key={id} style={styles.modalOption} onPress={() => selectCategory(id)}>
+                <Text>{capitalize(id)}</Text>
+              </TouchableOpacity>
+            ))
+          }
+
         </View>
       </Modal>
       <MapView

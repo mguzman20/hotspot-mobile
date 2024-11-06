@@ -66,3 +66,12 @@ export async function fetchLocations(token: string | null): Promise<CampusLocati
         return []
     }
 }
+
+export const CATEGORIES: readonly [string, ...string[]] = [
+    'baño',
+    'estudio',
+    'comida',
+    'sala',
+    'charla',
+    'concierto',
+]

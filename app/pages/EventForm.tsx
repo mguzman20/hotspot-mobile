@@ -10,6 +10,8 @@ import DropDownPicker from 'react-native-dropdown-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
+import { CATEGORIES } from '../helpers/backend';
+import { capitalize } from '../helpers/util';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -18,8 +20,8 @@ const formSchema = z.object({
     }),
     title: z.string().min(0, { message: 'El título debe tener al menos 6 caracteres' }).max(255, { message: 'El título debe tener 255 caracteres o menos' }),
     description: z.string().min(0, { message: 'La descripción debe tener al menos 6 caracteres' }).max(1024, { message: 'La descripción debe tener 1024 caracteres o menos' }),
-    category: z.enum(['Entretenimiento', 'Politica', 'Deporte', 'Tecnologia', 'Salud'], {
-        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: entretenimiento, política, deportes, tecnología, salud.' }),
+    category: z.enum(CATEGORIES, {
+        errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: ' + CATEGORIES.join(', ') + '.' }),
     }),
 });
 
@@ -126,13 +128,9 @@ export default function EventForm() {
                     name="category"
                     render={({ field: { onChange, value } }) => (
                         <DropDownPicker
-                            items={[
-                                { label: 'Entretenimiento', value: 'Entretenimiento' },
-                                { label: 'Politica', value: 'Politica' },
-                                { label: 'Deporte', value: 'Deporte' },
-                                { label: 'Tecnologia', value: 'Tecnologia' },
-                                { label: 'Salud', value: 'Salud' },
-                            ]}
+                            items={
+                                CATEGORIES.map(id => { return { label: capitalize(id), value: id } })
+                            }
                             listMode="SCROLLVIEW"
                             value={value}
                             placeholder='Selecciona una categoría'
