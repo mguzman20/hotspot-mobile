@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { FontAwesome } from '@expo/vector-icons';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -155,9 +156,11 @@ export default function LocationForm() {
                     }}
                     region={region}
                     onRegionChangeComplete={onRegionChangeComplete}
-                    showsUserLocation={true}  // Handle map press event to set coordinates
+                    showsUserLocation={true}
                 >
-                    <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+                    <View style={styles.centerMarker}>
+                        <FontAwesome name="map-marker" size={40} color="red" />
+                    </View>
                 </MapView>
                 {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
 

@@ -1,9 +1,9 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Button, Platform, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -12,14 +12,15 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { FontAwesome } from '@expo/vector-icons';
 
 const formSchema = z.object({
     coordinates: z.object({
         latitude: z.number().min(-90).max(90, { message: 'La latitud debe estar entre -90 y 90' }),
         longitude: z.number().min(-180).max(180, { message: 'La longitud debe estar entre -180 y 180' }),
     }),
-    title: z.string().min(0, { message: 'El título debe tener al menos 6 caracteres' }).max(255, { message: 'El título debe tener 255 caracteres o menos' }),
-    description: z.string().min(0, { message: 'La descripción debe tener al menos 6 caracteres' }).max(1024, { message: 'La descripción debe tener 1024 caracteres o menos' }),
+    title: z.string().min(6, { message: 'El título debe tener al menos 6 caracteres' }).max(255, { message: 'El título debe tener 255 caracteres o menos' }),
+    description: z.string().min(6, { message: 'La descripción debe tener al menos 6 caracteres' }).max(1024, { message: 'La descripción debe tener 1024 caracteres o menos' }),
     category: z.enum(CATEGORIES, {
         errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: ' + CATEGORIES.join(', ') + '.' }),
     }),
@@ -91,7 +92,7 @@ export default function EventForm() {
     return (
         <ScrollView>
             <View style={styles.container}>
-                <Text style={styles.label}>Titulo</Text>
+                <Text style={styles.label}>Título</Text>
                 <Controller
                     control={control}
                     name="title"
@@ -146,7 +147,7 @@ export default function EventForm() {
                 />
                 {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
 
-                <Text style={styles.label}>Ubicacion</Text>
+                <Text style={styles.label}>Ubicación</Text>
                 <MapView
                     style={{
                         width: '100%',
@@ -155,9 +156,11 @@ export default function EventForm() {
                     }}
                     region={region}
                     onRegionChangeComplete={onRegionChangeComplete}
-                    showsUserLocation={true}  // Handle map press event to set coordinates
+                    showsUserLocation={true}
                 >
-                    <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
+                    <View style={styles.centerMarker}>
+                        <FontAwesome name="map-marker" size={40} color="red" />
+                    </View>
                 </MapView>
                 {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
 

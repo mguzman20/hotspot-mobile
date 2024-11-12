@@ -60,4 +60,17 @@ export const styles = StyleSheet.create({
       alignSelf: 'center',
       textDecorationLine: 'underline',
     },
+    map: {
+      width: '100%',
+      height: 300,
+      marginVertical: 10,
+    },
+    centerMarker: {
+      position: 'absolute',
+      top: '50%',
+      left: '50%',
+      marginLeft: -10, // Ajusta la posición horizontal del icono
+      marginTop: -40,  // Ajusta la posición vertical del icono
+      zIndex: 3,
+    },
   });
