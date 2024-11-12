@@ -10,7 +10,7 @@ import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
-  LocationForm: undefined;
+  CreationMenu: undefined;
   Map: undefined;
 };
 
@@ -164,7 +164,7 @@ export default function CampusMap() {
       )}
       <TouchableOpacity style={styles.plusButton} onPress={() => {
         if (authState.authenticated) {
-          navigation.navigate("LocationForm")
+          navigation.navigate("CreationMenu")
         } else {
           Alert.alert('Inicia sesión para crear ubicaciones!')
         }
