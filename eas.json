@@ -5,8 +5,10 @@
   },
   "build": {
     "development": {
-      "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL":"http://ec2-3-135-142-148.us-east-2.compute.amazonaws.com"
+      }
     },
     "preview": {
       "distribution": "internal"
