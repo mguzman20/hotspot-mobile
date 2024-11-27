@@ -6,25 +6,13 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
-      "env": {
-        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
-      }
+      "distribution": "internal"
     },
     "preview": {
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      },
-      "env": {
-        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
-      }
+      "distribution": "internal"
     },
     "production": {
-      "autoIncrement": true,
-      "env": {
-        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
-      }
+      "autoIncrement": true
     }
   },
   "submit": {
