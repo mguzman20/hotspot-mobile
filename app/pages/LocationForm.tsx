@@ -14,7 +14,6 @@ import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
-import * as ImagePicker from 'expo-image-picker';   
 
 const formSchema = z.object({
     coordinates: z.object({
