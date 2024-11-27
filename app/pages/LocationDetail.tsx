@@ -17,10 +17,12 @@ interface Review {
     criteria: string[];
 }
 
-export default function LocationDetail({ route }: { route?: { params: { location: CampusLocation } } }) {
+export default function LocationDetail({ route }: { route?: { params: { locationId: string } } }) {
     if (route == null) return <></>
-    const { location } = route.params;
     const { authState, reloadSpots } = useAuth()
+    const { locationId } = route.params;
+    const location = authState.locationList.find((loc) => loc._id === locationId)
+    if (location == null) return <></>
 
 
     // HACK: expo 52 qlo
@@ -37,7 +39,7 @@ export default function LocationDetail({ route }: { route?: { params: { location
         { key: 'reviews', title: 'Reviews' },
         { key: 'about', title: 'About' },
     ]);
-    
+
 
     // Fetch reviews
     useEffect(() => {
@@ -90,11 +92,11 @@ export default function LocationDetail({ route }: { route?: { params: { location
         </ScrollView>
     );
 
-    
+
     const ReviewsTab = () => (
-        <Reviews 
+        <Reviews
             reviews={reviews}
-            locationID={location._id}/>
+            locationID={location._id} />
     );
 
     const About = () => (

@@ -9,7 +9,7 @@ import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
     Events: undefined;
-    EventDetail: { event: CampusEvent };
+    EventDetail: { eventId: string };
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
@@ -45,7 +45,7 @@ export default function Events() {
     };
 
     const handleCardPress = (event: CampusEvent) => {
-        navigation.navigate('EventDetail', { event });
+        navigation.navigate('EventDetail', { eventId: event._id });
     };
 
     const onRefresh = useCallback(() => {
@@ -76,7 +76,7 @@ export default function Events() {
                             resizeMode="cover"
                         />
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{capitalize(event.category)}</Text>
+                        <Text style={styles.eventCategory}>{`${capitalize(event.category)}:  ${event.points.length - event.negpoints.length} hotpoints`}</Text>
                     </View>
                 </TouchableOpacity>
             ))}
