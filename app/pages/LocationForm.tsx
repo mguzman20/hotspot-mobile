@@ -163,7 +163,7 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                             width: '100%',
                             height: 300,
                         }}
-                        // initialRegion={defaultRegion}
+                        initialRegion={route?.params?.initialRegion ? undefined : defaultRegion}
                         initialCamera={route?.params?.initialRegion}
                         onRegionChange={onRegionChange}
                         showsUserLocation={true}
