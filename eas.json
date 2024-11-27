@@ -6,13 +6,11 @@
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal",
       "env": {
         "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
       }
     },
     "preview": {
-      "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
