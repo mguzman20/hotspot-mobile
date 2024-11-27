@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import MapView, { Camera, Marker, Region } from 'react-native-maps';
+import MapView, { Camera, Marker, Region, PROVIDER_GOOGLE } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -159,6 +159,7 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                     marginVertical: 10,
                 }}>
                     <MapView
+                        provider={PROVIDER_GOOGLE}
                         style={{
                             width: '100%',
                             height: 300,
