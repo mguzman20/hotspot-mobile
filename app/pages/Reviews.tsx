@@ -18,7 +18,6 @@ interface Review {
     description: string;
     user: string;
     rating: number;
-    comment: string;
     criteria: string[];
 }
 
@@ -30,7 +29,7 @@ interface ReviewsProps {
 export default function Reviews({ reviews, locationID }: ReviewsProps) {
 
     const [isModalVisible, setModalVisible] = useState(false);
-    const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
+    const [newReview, setNewReview] = useState({ rating: 0, description: '' });
     const { authState, reloadSpots } = useAuth();
 
 
@@ -45,18 +44,19 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
     , []);
 
 
-    const handleSubmitReview = async (data: any) => {
+    const handleSubmitReview = async () => {
         try {
+            console.log('Submitting review:', newReview);
+            console.log(locationID)
             const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/locationreviews/${locationID}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authState.token}`,
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(newReview),
             });
             console.log(response)
-            // fetchReviews(); // Refresh reviews after submission
         } catch (error) {
             console.error('Error submitting review:', error);
         }
@@ -105,7 +105,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
                         style={styles.input}
                         placeholder="Write your comment..."
                         multiline
-                        onChangeText={(text) => setNewReview({ ...newReview, comment: text })}
+                        onChangeText={(text) => setNewReview({ ...newReview, description: text })}
                     />
 
                     <Button title="Submit Review" onPress={handleSubmitReview} />
@@ -124,7 +124,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
                 <View key={review.title} style={styles.reviewCard}>
                     <Text style={styles.reviewUser}>{review.user}</Text>
                     <Text style={styles.reviewRating}>{'★'.repeat(review.rating)}</Text>
-                    <Text style={styles.reviewComment}>{review.comment}</Text>
+                    <Text style={styles.reviewComment}>{review.description}</Text>
                 </View>
             ))
         ) : (
