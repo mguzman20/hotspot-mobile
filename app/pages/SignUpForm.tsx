@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, TextInput, Button, StyleSheet, Text, Alert, TouchableOpacity } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { useRouter } from 'expo-router';
+import * as Notifications from 'expo-notifications';
 
 export const styles = StyleSheet.create({
   container: {
@@ -61,6 +62,16 @@ export default function SignUpForm({ setLoginPage }: { setLoginPage: (x: 'login'
     }
 
     try {
+      const { status } = await Notifications.requestPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert('Permission Denied', 'We need permission to send notifications');
+        return;
+      }
+
+      // Get the Expo push token
+      const tokenResponse = await Notifications.getExpoPushTokenAsync();
+      const expoPushToken = tokenResponse.data;
+
       const response = await fetch(process.env.EXPO_PUBLIC_API_URL + "/register", {
         method: 'POST',
         headers: {
@@ -70,6 +81,7 @@ export default function SignUpForm({ setLoginPage }: { setLoginPage: (x: 'login'
           name: name.trim(),
           email: email.trim(),
           password,
+          pushToken: expoPushToken,
         }),
       });
 

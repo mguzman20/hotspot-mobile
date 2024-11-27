@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Stack } from 'expo-router';
 import AuthProvider from './context/AuthContext';
-import { Image, Text, View, StyleSheet } from 'react-native';
+import { Image, Alert, StyleSheet } from 'react-native';
+import * as Notifications from 'expo-notifications';
 
 
 const styles = StyleSheet.create({
@@ -23,7 +24,9 @@ function LogoTitle() {
   }
 
 
-const Layout = () => (
+const Layout = () =>{
+
+ return (
 	<AuthProvider>
 		<Stack
 			screenOptions={{
@@ -42,6 +45,6 @@ const Layout = () => (
 				}} />
 		</Stack>
 	</AuthProvider>
-);
+);}
 
 export default Layout;
