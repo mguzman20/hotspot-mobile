@@ -10,6 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import { set } from 'react-hook-form';
 
 interface Review {
+    _id: string;
     title: string;
     description: string;
     user: string;
@@ -57,6 +58,7 @@ export default function LocationDetail({ route }: { route?: { params: { location
         })
         console.log(response)
         setReviews(response)
+        reloadSpots()
     }
     
 
@@ -99,10 +101,12 @@ export default function LocationDetail({ route }: { route?: { params: { location
     );
 
 
+    // Make a callbak to fetch reviews
     const ReviewsTab = () => (
         <Reviews
             reviews={reviews}
-            locationID={location._id} />
+            locationID={location._id} 
+            fetchReviews={fetchReviews}/>
     );
 
     const About = () => (

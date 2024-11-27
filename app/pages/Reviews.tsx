@@ -4,34 +4,36 @@ import Modal from 'react-native-modal';
 import { useAuth } from '../context/AuthContext';
 
 
-// Dummy data for reviews
-const reviewsData = [
-    { score: 5, count: 10 },
-    { score: 4, count: 8 },
-    { score: 3, count: 5 },
-    { score: 2, count: 2 },
-    { score: 1, count: 1 },
-];
-
 interface Review {
     title: string;
     description: string;
     user: string;
     rating: number;
     criteria: string[];
+    _id: string;
 }
 
 interface ReviewsProps {
     reviews: Review[];
     locationID: string;
+    fetchReviews: () => void;
 }
 
-export default function Reviews({ reviews, locationID }: ReviewsProps) {
+export default function Reviews({ reviews, locationID, fetchReviews }: ReviewsProps) {
 
     const [isModalVisible, setModalVisible] = useState(false);
     const [newReview, setNewReview] = useState({ rating: 0, description: '' });
     const { authState, reloadSpots } = useAuth();
 
+    const reviewsData = reviews.reduce<{ score: number, count: number }[]>((acc, review) => {
+        const index = acc.findIndex((item) => item.score === review.rating);
+        if (index === -1) {
+            acc.push({ score: review.rating, count: 1 });
+        } else {
+            acc[index].count += 1;
+        }
+        return acc;
+    }, []);
 
     const toggleModal = () => {
         setModalVisible(!isModalVisible);
@@ -50,6 +52,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
             });
             console.log(response)
             setModalVisible(false);
+            fetchReviews()
         } catch (error) {
             console.error('Error submitting review:', error);
         }
@@ -58,7 +61,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
     return(
     <ScrollView style={styles.tabContainer}>
         {/* Review Summary */}
-        <Text style={styles.sectionTitle}>Reviews Summary</Text>
+        <Text style={styles.sectionTitle}>Reviews Summary </Text>
         <View style={styles.reviewSummaryContainer}>
             {reviewsData.map((item) => (
                 <View key={item.score} style={styles.reviewRow}>
@@ -114,7 +117,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
         <Text style={styles.sectionTitle}>Reviews</Text>
         {reviews.length > 0 ? (
             reviews.map((review) => (
-                <View key={review.title} style={styles.reviewCard}>
+                <View key={review._id} style={styles.reviewCard}>
                     <Text style={styles.reviewUser}>{review.user}</Text>
                     <Text style={styles.reviewRating}>{'★'.repeat(review.rating)}</Text>
                     <Text style={styles.reviewComment}>{review.description}</Text>
