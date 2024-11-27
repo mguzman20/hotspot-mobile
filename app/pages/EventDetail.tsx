@@ -1,18 +1,41 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { CampusEvent } from '../helpers/backend';
+import { backendFetch, CampusEvent } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { FontAwesome } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
 
 export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
     if (route == null) return <></>
     const { event } = route.params;
+    const { authState, reloadSpots } = useAuth()
+
+    console.log("event details: ", event)
+    console.log("user id", authState.userId)
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)
     useEffect(() => {
         setTimeout(() => setShowMap(true), 1000)
     }, [])
+
+    const onLikeChange = async (like: boolean) => {
+        console.log('liking ', event._id)
+        await backendFetch({
+            route: `/events/${like ? 'like' : 'dislike'}`,
+            method: 'POST',
+            token: authState.token,
+            body: {
+                eventId: event._id,
+            },
+            handleErr: {
+                alertTitle: `${like ? 'Like' : 'Dislike'} failed`,
+            },
+            rawResponse: true,
+        })
+        await reloadSpots()
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -25,6 +48,30 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
             />
             <Text style={styles.eventName}>{event.title}</Text>
             <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
+
+            <View style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+            }}>
+                <TouchableOpacity onPress={() => {
+                    onLikeChange(true)
+                }}>
+                    <FontAwesome name="thumbs-up" color={'gray'} size={40} style={{
+                        margin: 10,
+                    }} />
+                </TouchableOpacity>
+                <Text>
+                    {event.points.length - event.negpoints.length}
+                </Text>
+                <TouchableOpacity onPress={() => {
+                    onLikeChange(false)
+                }}>
+                    <FontAwesome name="thumbs-down" color="gray" size={40} style={{
+                        margin: 10,
+                    }} />
+                </TouchableOpacity>
+            </View>
 
             {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
