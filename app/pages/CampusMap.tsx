@@ -37,6 +37,11 @@ export default function CampusMap() {
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
   const showMarker = false;
+  const [showMap, setShowMap] = useState(false)
+
+  useEffect(() => {
+    setTimeout(() => setShowMap(true), 1000)
+  }, [])
 
   useEffect(() => {
     reloadEvents()
@@ -53,7 +58,7 @@ export default function CampusMap() {
       filtered = filtered.filter(event => event.category === filterCategory);
     }
     setFilteredEvents(filtered);
-  }, [filterText, filterCategory, authState.eventList]);
+  }, [filterText, filterCategory, authState.eventList, authState.locationList]);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -129,7 +134,7 @@ export default function CampusMap() {
 
         </View>
       </Modal>
-      <MapView
+      {showMap && <MapView
         ref={mapRef}
         initialRegion={defaultRegion}
         style={styles.map}
@@ -142,9 +147,10 @@ export default function CampusMap() {
             coordinate={event.coordinates}
             title={event.title}
             description={'Categoria: ' + capitalize(event.category)}
-          />
+          >
+          </Marker>
         ))}
-      </MapView>
+      </MapView>}
       {showMarker && <View style={styles.posIcon}>
         <FontAwesome name="map-marker" size={40} color="red" />
       </View>}
