@@ -1,6 +1,6 @@
 import { Alert } from "react-native";
 
-export type CampusSpot = {
+export type CampusBase = {
     coordinates: {
         latitude: number;
         longitude: number;
@@ -11,13 +11,15 @@ export type CampusSpot = {
     img?: string;
 }
 
-export type CampusEvent = CampusSpot & {
+export type CampusEvent = CampusBase & {
     date: Date;
 };
 
-export type CampusLocation = CampusSpot & {
+export type CampusLocation = CampusBase & {
     score: Number;
 }
+
+export type CampusSpot = CampusEvent | CampusLocation;
 
 export async function fetchEvents(token: string | null): Promise<CampusEvent[]> {
     try {

@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
-import { CampusEvent } from '../helpers/backend';
+import { CampusEvent, CampusLocation } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
-export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
+export default function LocationDetail({ route }: { route?: { params: { location: CampusLocation } } }) {
     if (route == null) return <></>
-    const { event } = route.params;
+    const { location } = route.params;
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)
@@ -19,36 +19,36 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
             <Image
                 style={styles.imagePlaceholder}
                 source={{
-                    uri: event.img ? event.img : 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
+                    uri: location.img ? location.img : 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
                 }}
                 resizeMode="cover"
             />
-            <Text style={styles.eventName}>{event.title}</Text>
-            <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
+            <Text style={styles.eventName}>{location.title}</Text>
+            <Text style={styles.eventCategory}>Categoría: {capitalize(location.category)}</Text>
 
             {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
                 {showMap && <MapView
                     style={styles.map}
                     initialRegion={{
-                        latitude: event.coordinates.latitude,
-                        longitude: event.coordinates.longitude,
+                        latitude: location.coordinates.latitude,
+                        longitude: location.coordinates.longitude,
                         latitudeDelta: 0.005,
                         longitudeDelta: 0.005,
                     }}
                 >
                     <Marker
                         coordinate={{
-                            latitude: event.coordinates.latitude,
-                            longitude: event.coordinates.longitude,
+                            latitude: location.coordinates.latitude,
+                            longitude: location.coordinates.longitude,
                         }}
-                        title={event.title}
-                        description={event.description}
+                        title={location.title}
+                        description={location.description}
                     />
                 </MapView>}
             </View>
 
-            <Text style={styles.eventDescription}>Descripción: {event.description}</Text>
+            <Text style={styles.eventDescription}>Descripción: {location.description}</Text>
         </ScrollView>
     );
 }
