@@ -17,6 +17,15 @@ export type CampusEvent = CampusBase & {
 
 export type CampusLocation = CampusBase & {
     score: Number;
+    _id: string;
+}
+
+export type CampusLocationReview = {
+    title: string;
+    location: string;
+    user: string;
+    score: number;
+    comment: string;
 }
 
 export type CampusSpot = CampusEvent | CampusLocation;

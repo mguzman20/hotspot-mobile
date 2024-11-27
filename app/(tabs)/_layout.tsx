@@ -61,7 +61,7 @@ export default function TabLayout() {
               ),
             }}
         />
-        <Tabs.Screen
+        {/* <Tabs.Screen
             name="Notifications"
             options={{
             tabBarLabel: "Notificaciones",
@@ -80,7 +80,7 @@ export default function TabLayout() {
                 <AntDesign name="menufold" size={24} color={color} />
               ),
             }}
-        />  
+        />   */}
     </Tabs>
   );
 }
