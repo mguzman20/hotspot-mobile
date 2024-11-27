@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Camera, Marker, Region } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -12,6 +12,7 @@ import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { FontAwesome } from '@expo/vector-icons';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -26,7 +27,12 @@ const formSchema = z.object({
 });
 
 
-export default function LocationForm() {
+export interface LocationFormParams {
+    initialRegion?: Camera;
+}
+
+
+export default function LocationForm({ route }: { route?: { params: LocationFormParams } }) {
     const navigation = useNavigation();
     const { control, handleSubmit, formState: { errors }, setValue } = useForm({
         resolver: zodResolver(formSchema),
@@ -39,12 +45,14 @@ export default function LocationForm() {
         southWest: { latitude: -33.501466, longitude: -70.616074 },
     }
 
-    const [region, setRegion] = useState({
+    const defaultRegion: Region = {
         latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
         longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
         latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
         longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude
-    });
+    };
+
+    const [region, setRegion] = useState(defaultRegion);
 
     const onSubmit = async (data: any) => {
         console.log(data);
@@ -81,8 +89,7 @@ export default function LocationForm() {
     };
 
     // Handle the map press to set coordinates
-    const onRegionChangeComplete = (newRegion: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
-        setRegion(newRegion);
+    const onRegionChange = (newRegion: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
         // Update the coordinates in the form
         setValue('coordinates', { latitude: newRegion.latitude, longitude: newRegion.longitude });
     };
@@ -147,18 +154,25 @@ export default function LocationForm() {
                 {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
 
                 <Text style={styles.label}>Ubicacion</Text>
-                <MapView
-                    style={{
-                        width: '100%',
-                        height: 300,
-                        marginVertical: 10,
-                    }}
-                    region={region}
-                    onRegionChangeComplete={onRegionChangeComplete}
-                    showsUserLocation={true}  // Handle map press event to set coordinates
-                >
-                    <Marker coordinate={{ latitude: region.latitude, longitude: region.longitude }} />
-                </MapView>
+                <View style={{
+                    padding: 0,
+                    marginVertical: 10,
+                }}>
+                    <MapView
+                        style={{
+                            width: '100%',
+                            height: 300,
+                        }}
+                        initialRegion={route?.params?.initialRegion ? undefined : defaultRegion}
+                        initialCamera={route?.params?.initialRegion}
+                        onRegionChange={onRegionChange}
+                        showsUserLocation={true}
+                    >
+                    </MapView>
+                    <View style={styles.centerMarker}>
+                        <FontAwesome name="map-marker" size={40} color="red" />
+                    </View>
+                </View>
                 {errors.coordinates && <Text style={styles.error}>Invalid coordinates</Text>}
 
                 <Button title="Submit" onPress={handleSubmit(onSubmit)} />

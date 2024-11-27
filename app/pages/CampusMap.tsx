@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region, Details, Camera } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
@@ -10,13 +10,25 @@ import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
-  LocationForm: undefined;
+  CreationMenu: { initialRegion: Camera };
   Map: undefined;
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Map'>;
 
 export default function CampusMap() {
+  const boundaries = {
+    northEast: { latitude: -33.495314, longitude: -70.604986 },
+    southWest: { latitude: -33.501466, longitude: -70.616074 },
+  }
+
+  const defaultRegion: Region = {
+    latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
+    longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
+    latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
+    longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude,
+  }
+
   const mapRef = useRef<MapView>(null);
   const [filterText, setFilterText] = useState<string>('');
   const [filterCategory, setCategory] = useState<string>('all');
@@ -24,17 +36,12 @@ export default function CampusMap() {
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
+  const showMarker = false;
+  const [showMap, setShowMap] = useState(false)
 
-
-  const fetchEvents = async () => {
-    const events = await fetch(process.env.EXPO_PUBLIC_API_URL + '/events', {
-      headers: {
-        'Auth-Token': authState.token ?? '',
-      }
-    })
-    const data = await events.json()
-    // console.log(data)
-  }
+  useEffect(() => {
+    setTimeout(() => setShowMap(true), 1000)
+  }, [])
 
   useEffect(() => {
     reloadEvents()
@@ -51,7 +58,7 @@ export default function CampusMap() {
       filtered = filtered.filter(event => event.category === filterCategory);
     }
     setFilteredEvents(filtered);
-  }, [filterText, filterCategory, authState.eventList]);
+  }, [filterText, filterCategory, authState.eventList, authState.locationList]);
 
   const toggleModal = () => {
     setIsModalVisible(!isModalVisible);
@@ -64,11 +71,6 @@ export default function CampusMap() {
 
   const [locationStatus, requestLocationPermission] = Location.useForegroundPermissions()
   const [userLocation, setUserLocation] = useState<Region | null>(null);
-
-  const boundaries = {
-    northEast: { latitude: -33.495314, longitude: -70.604986 },
-    southWest: { latitude: -33.501466, longitude: -70.616074 },
-  }
 
   useEffect(() => {
     requestLocation();
@@ -132,14 +134,9 @@ export default function CampusMap() {
 
         </View>
       </Modal>
-      <MapView
+      {showMap && <MapView
         ref={mapRef}
-        initialRegion={{
-          latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
-          longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
-          latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
-          longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude,
-        }}
+        initialRegion={defaultRegion}
         style={styles.map}
         provider={Platform.OS === 'ios' ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
         showsUserLocation={true}
@@ -157,19 +154,22 @@ export default function CampusMap() {
             <FontAwesome name="map-marker" size={40} color={'date' in event ? "green" : "blue"} />
           </Marker>
         ))}
-      </MapView>
-      <View style={styles.posIcon}>
+      </MapView>}
+      {showMarker && <View style={styles.posIcon}>
         <FontAwesome name="map-marker" size={40} color="red" />
-      </View>
+      </View>}
       {/* Show only if location was granted */}
       {userLocation && (
         <TouchableOpacity style={styles.centerIcon} onPress={centerMapOnUserLocation}>
           <FontAwesome name="crosshairs" size={24} color="white" />
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={styles.plusButton} onPress={() => {
+      <TouchableOpacity style={styles.plusButton} onPress={async () => {
         if (authState.authenticated) {
-          navigation.navigate("LocationForm")
+          const camera = await mapRef.current?.getCamera()
+          if (camera != null) {
+            navigation.navigate("CreationMenu", { initialRegion: camera })
+          }
         } else {
           Alert.alert('Inicia sesión para crear ubicaciones!')
         }
