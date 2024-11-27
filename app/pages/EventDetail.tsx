@@ -6,10 +6,12 @@ import { capitalize } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
-export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
+export default function EventDetail({ route }: { route?: { params: { eventId: string } } }) {
     if (route == null) return <></>
-    const { event } = route.params;
     const { authState, reloadSpots } = useAuth()
+    const { eventId } = route.params;
+    const event = authState.eventList.find((ev) => ev._id === eventId)
+    if (event == null) return <></>
 
     console.log("event details: ", event)
     console.log("user id", authState.userId)
@@ -37,6 +39,10 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
         await reloadSpots()
     }
 
+    const hasLike = event.points.includes(authState.userId ?? '')
+    const hasDislike = event.negpoints.includes(authState.userId ?? '')
+    const unauth = !authState.userId
+
     return (
         <ScrollView style={styles.container}>
             <Image
@@ -53,21 +59,24 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'flex-start',
+                marginBottom: 16,
             }}>
-                <TouchableOpacity onPress={() => {
+                <TouchableOpacity disabled={!authState.userId} onPress={() => {
                     onLikeChange(true)
                 }}>
-                    <FontAwesome name="thumbs-up" color={'gray'} size={40} style={{
+                    <FontAwesome name="thumbs-up" color={unauth ? 'lightgray' : hasLike ? 'green' : 'gray'} size={40} style={{
                         margin: 10,
                     }} />
                 </TouchableOpacity>
-                <Text>
-                    {event.points.length - event.negpoints.length}
-                </Text>
-                <TouchableOpacity onPress={() => {
+                <View style={{ width: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ textAlignVertical: 'center', fontSize: 32, margin: 1 }}>
+                        {event.points.length - event.negpoints.length}
+                    </Text>
+                </View>
+                <TouchableOpacity disabled={!authState.userId} onPress={() => {
                     onLikeChange(false)
                 }}>
-                    <FontAwesome name="thumbs-down" color="gray" size={40} style={{
+                    <FontAwesome name="thumbs-down" color={unauth ? 'lightgray' : hasDislike ? 'red' : 'gray'} size={40} style={{
                         margin: 10,
                     }} />
                 </TouchableOpacity>
