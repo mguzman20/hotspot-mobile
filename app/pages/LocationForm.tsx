@@ -83,16 +83,10 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
 
     const onSubmit = async (data: any) => {
         console.log(data);
-
-        // Send the data to the API
-
+    
         try {
-            const fileType = image?.split('.').pop();
-            if (!image || !fileType) {
-                Alert.alert('Por favor, selecciona una imagen válida');
-                return;
-            };
-
+            const fileType = image?.split('.').pop(); // Obtén el tipo de archivo si hay imagen
+    
             const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/locations', {
                 method: 'POST',
                 headers: {
@@ -101,36 +95,39 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                 },
                 body: JSON.stringify({
                     ...data,
-                    fileType: `image/${fileType}`,
+                    fileType: image ? `image/${fileType}` : null, // Solo incluye el tipo si hay imagen
                 }),
             });
-
+    
             if (response.ok) {
-                // Redirect to the event page
                 const { imageUrl } = await response.json();
-                const uploadResponse = await fetch(imageUrl, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': `image/${fileType}`,
-                    },
-                    body: await fetch(image).then((res) => res.blob()),
-                });
+    
+                if (image && fileType) {
+                    // Solo sube la imagen si existe
+                    await fetch(imageUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': `image/${fileType}`,
+                        },
+                        body: await fetch(image).then((res) => res.blob()),
+                    });
+                }
+    
                 Alert.alert('Ubicación creada exitosamente');
                 console.log('created location', data);
                 navigation.goBack();
                 reloadSpots();
             } else {
-                // Display an error message
                 console.error('Failed to create location');
                 const error = await response.json();
                 console.error(error);
-            };
+            }
         } catch (error) {
             console.error('Failed to create location');
             console.error(error);
         }
-
     };
+    
 
     // Handle the map press to set coordinates
     const onRegionChange = (newRegion: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
