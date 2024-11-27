@@ -7,6 +7,7 @@ import { CampusEvent, CampusLocation } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 import { backendFetch } from '../helpers/backend';
 import { useAuth } from '../context/AuthContext';
+import { set } from 'react-hook-form';
 
 interface Review {
     title: string;
@@ -41,19 +42,23 @@ export default function LocationDetail({ route }: { route?: { params: { location
     ]);
 
 
-    // Fetch reviews
+    // Fetch reviews asynchonously
     useEffect(() => {
-        console.log('fetching reviews')
-        backendFetch({
-            route: `/locationreviews/${location._id}`,
-            method: 'POST',
-            token: authState.token,
-            body: {
-            },
-            rawResponse: true,
-        })
-        console.log(reviews)
+        fetchReviews()
     }, []);
+    
+
+    const fetchReviews = async () => {
+        console.log('fetching reviews')
+        const response = await backendFetch({
+            route: `/locationreviews/${location._id}`,
+            method: 'GET',
+            token: authState.token,
+        })
+        console.log(response)
+        setReviews(response)
+    }
+    
 
     const Overview = () => (
         <ScrollView style={styles.tabContainer}>
@@ -65,6 +70,7 @@ export default function LocationDetail({ route }: { route?: { params: { location
                 resizeMode="cover"
             />
             <Text style={styles.eventName}>{location.title}</Text>
+            <Text style={styles.eventCategory}>Rating: {String(Math.round(location.score*100)/100)}</Text>
             <Text style={styles.eventCategory}>Category: {capitalize(location.category)}</Text>
 
             <View style={styles.mapContainer}>

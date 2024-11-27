@@ -37,17 +37,9 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
         setModalVisible(!isModalVisible);
     };
 
-    useEffect(() => {
-        console.log(reviews)
-        console.log(locationID)
-    }
-    , []);
-
-
     const handleSubmitReview = async () => {
         try {
-            console.log('Submitting review:', newReview);
-            console.log(locationID)
+            console.log(JSON.stringify(newReview))
             const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/locationreviews/${locationID}`, {
                 method: 'POST',
                 headers: {
@@ -57,6 +49,7 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
                 body: JSON.stringify(newReview),
             });
             console.log(response)
+            setModalVisible(false);
         } catch (error) {
             console.error('Error submitting review:', error);
         }
