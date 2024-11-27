@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
 import MapView, { Marker } from 'react-native-maps';
 import { backendFetch, CampusEvent } from '../helpers/backend';
-import { capitalize } from '../helpers/util';
+import { capitalize, formatDate } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
@@ -54,6 +54,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
             />
             <Text style={styles.eventName}>{event.title}</Text>
             <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
+            <Text style={styles.eventCategory}>Inicio: {formatDate(event.date)}</Text>
 
             <View style={{
                 display: 'flex',

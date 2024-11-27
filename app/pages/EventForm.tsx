@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
-import { View, Text, TextInput, Button, Platform, ScrollView, Alert } from 'react-native';
-import { useForm, Controller } from 'react-hook-form';
+import React, { useEffect, useState } from 'react';
+import { View, Text, TextInput, Button, Platform, ScrollView, Alert, TouchableOpacity } from 'react-native';
+import { useForm, Controller, set } from 'react-hook-form';
 import { z } from 'zod';
 import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region, Camera } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -13,6 +13,8 @@ import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
+import DateTimePicker, { DateTimePickerEvent } from '@react-native-community/datetimepicker';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -24,6 +26,7 @@ const formSchema = z.object({
     category: z.enum(CATEGORIES, {
         errorMap: () => ({ message: 'La categoría debe ser una de las opciones permitidas: ' + CATEGORIES.join(', ') + '.' }),
     }),
+    date: z.date(),
 });
 
 
@@ -51,6 +54,9 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
         latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
         longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude
     };
+
+    const [datetime, setDatetime] = useState(new Date())
+    const [showPicker, setShowPicker] = useState<'no' | 'date' | 'time'>('no')
 
     const onSubmit = async (data: any) => {
         console.log(data);
@@ -92,6 +98,39 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
         setValue('coordinates', { latitude: newRegion.latitude, longitude: newRegion.longitude });
     };
 
+    useEffect(() => setValue("date", datetime), [datetime])
+
+    const onDateChange = (ev: DateTimePickerEvent, dt?: Date) => {
+        if (ev.type === 'dismissed') {
+            setShowPicker('no')
+            return
+        }
+        if (dt) {
+            if (showPicker === 'date') {
+                setDatetime(prev => {
+                    const d = new Date(prev)
+                    d.setUTCFullYear(dt.getUTCFullYear())
+                    d.setUTCMonth(dt.getUTCMonth())
+                    d.setUTCDate(dt.getUTCDate())
+                    return d
+                })
+                setShowPicker('time')
+            } else if (showPicker === 'time') {
+                setDatetime(prev => {
+                    const d = new Date(prev)
+                    d.setUTCHours(dt.getUTCHours())
+                    d.setUTCMinutes(dt.getUTCMinutes())
+                    d.setUTCSeconds(dt.getUTCSeconds())
+                    return d
+                })
+                setShowPicker('no')
+            } else {
+                setShowPicker('no')
+            }
+        } else {
+            setShowPicker('no')
+        }
+    }
 
     return (
         <ScrollView>
@@ -150,6 +189,23 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
                     )}
                 />
                 {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
+
+                <Text style={styles.label}>Fecha y hora de inicio</Text>
+                <TouchableOpacity onPress={() => setShowPicker('date')} style={{ marginBottom: 16 }}>
+                    <Text style={{ fontSize: 16, backgroundColor: 'lightgray', borderRadius: 8, textAlign: 'center', paddingVertical: 5 }}>
+                        {datetime.toLocaleString()}
+                    </Text>
+                </TouchableOpacity>
+                {showPicker !== 'no' && <SafeAreaView>
+                    <DateTimePicker
+                        testID="event-datetime"
+                        value={datetime}
+                        mode={showPicker}
+                        onChange={onDateChange}
+                        minimumDate={new Date()}
+                    />
+                </SafeAreaView>}
+                {errors.datetime && <Text style={styles.error}>{String(errors.datetime.message)}</Text>}
 
                 <Text style={styles.label}>Ubicación</Text>
                 <View style={{
