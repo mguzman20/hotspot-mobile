@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react';
-import { View, Text, ScrollView, StyleSheet, Button, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, ScrollView, StyleSheet, Button, TouchableOpacity, TextInput, Alert } from 'react-native';
 import Modal from 'react-native-modal';
 import { useAuth } from '../context/AuthContext';
 
@@ -36,11 +36,16 @@ export default function Reviews({ reviews, locationID, fetchReviews }: ReviewsPr
     }, []);
 
     const toggleModal = () => {
-        setModalVisible(!isModalVisible);
+        if (authState.authenticated) {
+            setModalVisible(!isModalVisible);  
+        } else {
+            Alert.alert("Inicia sesión para escribir reseñas!")
+        }
+        
     };
 
     const handleSubmitReview = async () => {
-        try {
+        try {        
             console.log(JSON.stringify(newReview))
             const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/locationreviews/${locationID}`, {
                 method: 'POST',
