@@ -76,7 +76,7 @@ export default function Events() {
                             resizeMode="cover"
                         />
                         <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{capitalize(event.category)}</Text>
+                        <Text style={styles.eventCategory}>{`${capitalize(event.category)}:  ${event.points.length - event.negpoints.length} hotpoints`}</Text>
                     </View>
                 </TouchableOpacity>
             ))}
