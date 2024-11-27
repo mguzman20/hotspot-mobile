@@ -6,12 +6,14 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
-import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
+import { CampusEvent, CampusLocation, CampusSpot, CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
   CreationMenu: { initialRegion: Camera };
   Map: undefined;
+  EventDetail: { event: CampusEvent }
+  LocationDetail: { location: CampusLocation }
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Map'>;
@@ -32,11 +34,11 @@ export default function CampusMap() {
   const mapRef = useRef<MapView>(null);
   const [filterText, setFilterText] = useState<string>('');
   const [filterCategory, setCategory] = useState<string>('all');
-  const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
+  const [filteredSpots, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
-  const showMarker = false;
+  const showCenterMarker = false;
   const [showMap, setShowMap] = useState(false)
 
   useEffect(() => {
@@ -141,21 +143,35 @@ export default function CampusMap() {
         provider={Platform.OS === 'ios' ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
         showsUserLocation={true}
       >
-        {filteredEvents.map((event, index) => (
+        {filteredSpots.map((spot, index) => (
           <Marker
             key={index}
-            coordinate={event.coordinates}
-            title={event.title}
-            description={'Categoria: ' + capitalize(event.category)}
+            coordinate={spot.coordinates}
+            title={
+              "date" in spot ? `Evento: ${spot.title}` : spot.title}
+            description={'Categoria: ' + capitalize(spot.category)}
+            onCalloutPress={() => {
+              console.log("callout press")
+              if ("date" in spot) {
+                navigation.navigate("EventDetail", { event: spot })
+              } else {
+                navigation.navigate("LocationDetail", { location: spot })
+              }
+            }}
             onSelect={() => {
-
+              console.log("select")
+            }}
+            style={{
+              zIndex: 2,
             }}
           >
-            <FontAwesome name="map-marker" size={40} color={'date' in event ? "green" : "blue"} />
+            <FontAwesome name="map-marker" size={40} color={'date' in spot ? "green" : "blue"} style={{
+              marginTop: -3
+            }} />
           </Marker>
         ))}
       </MapView>}
-      {showMarker && <View style={styles.posIcon}>
+      {showCenterMarker && <View style={styles.posIcon}>
         <FontAwesome name="map-marker" size={40} color="red" />
       </View>}
       {/* Show only if location was granted */}

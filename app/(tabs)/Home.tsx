@@ -6,6 +6,8 @@ import { createStackNavigator } from '@react-navigation/stack';
 import CreationMenu from '../pages/CreationMenu';
 import EventForm from '../pages/EventForm';
 import LocationForm from '../pages/LocationForm';
+import EventDetail from '../pages/EventDetail';
+import LocationDetail from '../pages/LocationDetail';
 
 export default function Tab() {
 
@@ -27,6 +29,16 @@ export default function Tab() {
             name="EventForm"
             component={EventForm}
             options={{ title: 'Crear Evento' }}
+          />
+          <Stack.Screen
+            name="EventDetail"
+            component={EventDetail}
+            options={{ title: 'Detalle del Evento' }}
+          />
+          <Stack.Screen
+            name="LocationDetail"
+            component={LocationDetail}
+            options={{ title: 'Detalle del Lugar' }}
           />
           <Stack.Screen
             name="LocationForm"
