@@ -76,19 +76,17 @@ export default function LocationDetail({ route }: { route?: { params: { location
             <Text style={styles.eventCategory}>Category: {capitalize(location.category)}</Text>
 
             <View style={styles.mapContainer}>
-                {showMap && <MapView
-                    provider={PROVIDER_GOOGLE}
-                    style={styles.map}
-                    initialRegion={{
-                        latitude: location.coordinates.latitude,
-                        longitude: location.coordinates.longitude,
-                        latitudeDelta: 0.005,
-                        longitudeDelta: 0.005,
-                    }}
-                >
-                    <Marker
-                        coordinate={{
-
+            {showMap && (
+                    <MapView
+                        provider={PROVIDER_GOOGLE}
+                        style={styles.map}
+                        initialRegion={{
+                            latitude: location.coordinates.latitude,
+                            longitude: location.coordinates.longitude,
+                            latitudeDelta: 0.005,
+                            longitudeDelta: 0.005,
+                        }}
+                    >
                         <Marker
                             coordinate={{
                                 latitude: location.coordinates.latitude,
