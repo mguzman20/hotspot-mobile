@@ -1,9 +1,9 @@
 import React from 'react';
 import { View, TouchableOpacity, StyleSheet, Text, Alert } from 'react-native';
 import { useAuth } from '../context/AuthContext';
-import { Region } from 'react-native-maps';
+import { Camera, Region } from 'react-native-maps';
 
-export default function CreationMenu({ navigation, route }: { navigation?: any, route?: { params: { initialRegion?: Region } } }) {
+export default function CreationMenu({ navigation, route }: { navigation?: any, route?: { params: { initialRegion?: Camera } } }) {
   const { authState } = useAuth();
 
   return (

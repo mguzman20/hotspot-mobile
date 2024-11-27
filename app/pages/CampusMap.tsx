@@ -1,6 +1,6 @@
 import { View, Text, StyleSheet, Platform, TextInput, TouchableOpacity, Modal, Alert } from 'react-native';
 import React, { useEffect, useRef, useState } from 'react';
-import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region, Details } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE, PROVIDER_DEFAULT, Region, Details, Camera } from 'react-native-maps';
 import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import * as Location from 'expo-location';
@@ -10,7 +10,7 @@ import { CampusEvent, CampusSpot, CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
-  CreationMenu: { initialRegion: Region };
+  CreationMenu: { initialRegion: Camera };
   Map: undefined;
 };
 
@@ -37,12 +37,6 @@ export default function CampusMap() {
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
   const showMarker = false;
-  const [currentRegion, setCurrentRegion] = useState<Region>(defaultRegion);
-
-
-  const onRegionChangeComplete = (region: Region, details: Details) => {
-    setCurrentRegion(region)
-  }
 
   useEffect(() => {
     reloadEvents()
@@ -138,7 +132,6 @@ export default function CampusMap() {
       <MapView
         ref={mapRef}
         initialRegion={defaultRegion}
-        onRegionChangeComplete={onRegionChangeComplete}
         style={styles.map}
         provider={Platform.OS === 'ios' ? PROVIDER_DEFAULT : PROVIDER_GOOGLE}
         showsUserLocation={true}
@@ -161,9 +154,12 @@ export default function CampusMap() {
           <FontAwesome name="crosshairs" size={24} color="white" />
         </TouchableOpacity>
       )}
-      <TouchableOpacity style={styles.plusButton} onPress={() => {
+      <TouchableOpacity style={styles.plusButton} onPress={async () => {
         if (authState.authenticated) {
-          navigation.navigate("CreationMenu", { initialRegion: currentRegion })
+          const camera = await mapRef.current?.getCamera()
+          if (camera != null) {
+            navigation.navigate("CreationMenu", { initialRegion: camera })
+          }
         } else {
           Alert.alert('Inicia sesión para crear ubicaciones!')
         }

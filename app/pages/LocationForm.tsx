@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
-import MapView, { Marker, Region } from 'react-native-maps';
+import MapView, { Camera, Marker, Region } from 'react-native-maps';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
@@ -28,7 +28,7 @@ const formSchema = z.object({
 
 
 export interface LocationFormParams {
-    initialRegion?: Region;
+    initialRegion?: Camera;
 }
 
 
@@ -163,7 +163,8 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                             width: '100%',
                             height: 300,
                         }}
-                        initialRegion={route?.params.initialRegion ?? defaultRegion}
+                        // initialRegion={defaultRegion}
+                        initialCamera={route?.params.initialRegion}
                         onRegionChange={onRegionChange}
                         showsUserLocation={true}
                     >
