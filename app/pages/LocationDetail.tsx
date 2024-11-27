@@ -1,21 +1,69 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
 import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import Reviews from './Reviews';
+import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { CampusEvent, CampusLocation } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { backendFetch } from '../helpers/backend';
+import { useAuth } from '../context/AuthContext';
+import { set } from 'react-hook-form';
 
-export default function LocationDetail({ route }: { route?: { params: { location: CampusLocation } } }) {
+interface Review {
+    _id: string;
+    title: string;
+    description: string;
+    user: string;
+    rating: number;
+    comment: string;
+    criteria: string[];
+}
+
+export default function LocationDetail({ route }: { route?: { params: { locationId: string } } }) {
     if (route == null) return <></>
-    const { location } = route.params;
+    const { authState, reloadSpots } = useAuth()
+    const { locationId } = route.params;
+    const location = authState.locationList.find((loc) => loc._id === locationId)
+    if (location == null) return <></>
+
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)
     useEffect(() => {
+        console.log(location)
         setTimeout(() => setShowMap(true), 1000)
     }, [])
 
-    return (
-        <ScrollView style={styles.container}>
+    const [index, setIndex] = useState(0);
+    const [reviews, setReviews] = useState<Review[]>([]);
+    const [routes] = useState([
+        { key: 'overview', title: 'Overview' },
+        { key: 'reviews', title: 'Reviews' },
+        { key: 'about', title: 'About' },
+    ]);
+
+
+    // Fetch reviews asynchonously
+    useEffect(() => {
+        fetchReviews()
+    }, []);
+    
+
+    const fetchReviews = async () => {
+        console.log('fetching reviews')
+        const response = await backendFetch({
+            route: `/locationreviews/${location._id}`,
+            method: 'GET',
+            token: authState.token,
+        })
+        console.log(response)
+        setReviews(response)
+        reloadSpots()
+    }
+    
+
+    const Overview = () => (
+        <ScrollView style={styles.tabContainer}>
             <Image
                 style={styles.imagePlaceholder}
                 source={{
@@ -24,9 +72,9 @@ export default function LocationDetail({ route }: { route?: { params: { location
                 resizeMode="cover"
             />
             <Text style={styles.eventName}>{location.title}</Text>
-            <Text style={styles.eventCategory}>Categoría: {capitalize(location.category)}</Text>
+            <Text style={styles.eventCategory}>Rating: {String(Math.round(location.score*100)/100)}</Text>
+            <Text style={styles.eventCategory}>Category: {capitalize(location.category)}</Text>
 
-            {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
                 {showMap && <MapView
                     provider={PROVIDER_GOOGLE}
@@ -40,17 +88,59 @@ export default function LocationDetail({ route }: { route?: { params: { location
                 >
                     <Marker
                         coordinate={{
-                            latitude: location.coordinates.latitude,
-                            longitude: location.coordinates.longitude,
-                        }}
-                        title={location.title}
-                        description={location.description}
-                    />
-                </MapView>}
-            </View>
 
-            <Text style={styles.eventDescription}>Descripción: {location.description}</Text>
+                        <Marker
+                            coordinate={{
+                                latitude: location.coordinates.latitude,
+                                longitude: location.coordinates.longitude,
+                            }}
+                            title={location.title}
+                            description={location.description}
+                        />
+                    </MapView>
+                )}
+            </View>
         </ScrollView>
+    );
+
+
+    // Make a callbak to fetch reviews
+    const ReviewsTab = () => (
+        <Reviews
+            reviews={reviews}
+            locationID={location._id} 
+            fetchReviews={fetchReviews}/>
+    );
+
+    const About = () => (
+        <ScrollView style={styles.tabContainer}>
+            <Text style={styles.sectionTitle}>About</Text>
+            <Text style={styles.eventDescription}>{location.description}</Text>
+        </ScrollView>
+    );
+
+    const renderScene = SceneMap({
+        overview: Overview,
+        reviews: ReviewsTab,
+        about: About,
+    });
+
+
+    return (
+        <TabView
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={{ width: Dimensions.get('window').width }}
+            renderTabBar={(props) => (
+                <TabBar
+                    {...props}
+                    indicatorStyle={styles.indicator}
+                    style={styles.tabBar}
+                    labelStyle={styles.tabLabel}
+                />
+            )}
+        />
     );
 }
 
@@ -87,5 +177,24 @@ const styles = StyleSheet.create({
     eventDescription: {
         fontSize: 16,
         color: '#424242',
+    },
+    sectionTitle: {
+        fontSize: 20,
+        fontWeight: 'bold',
+        marginBottom: 12,
+    },
+    tabBar: {
+        backgroundColor: '#DC1B1B',
+    },
+    indicator: {
+        backgroundColor: '#000',
+    },
+    tabLabel: {
+        color: 'Black',
+        fontWeight: 'bold',
+    },
+    tabContainer: {
+        flex: 1,
+        padding: 16,
     },
 });

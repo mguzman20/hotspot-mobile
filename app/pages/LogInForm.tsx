@@ -61,14 +61,13 @@ export default function LogInForm({ setLoginPage }: { setLoginPage: (x: 'login' 
         }),
       });
 
-      const data = await response.json();
+      const { data: { message, token, id: userId } } = await response.json();
       if (response.ok) {
-        const token = response.headers.get('auth-token');
-        setAuthState(authState => { return { ...authState, token, authenticated: true } });
+        setAuthState(authState => { return { ...authState, token, userId: userId, authenticated: true } });
         router.replace('/(tabs)/Home');
         Alert.alert('Success', 'Login successful');
       } else {
-        Alert.alert('Error', data.message || 'Login failed');
+        Alert.alert('Error', message || 'Login failed');
       }
     } catch (error) {
       Alert.alert('Error', 'Something went wrong. Please try again later.');

@@ -5,6 +5,7 @@ import { CampusEvent, CampusLocation, fetchEvents, fetchLocations } from '../hel
 interface AuthState {
     authenticated: boolean;
     token: string | null;
+    userId: string | null;
     eventList: CampusEvent[];
     locationList: CampusLocation[];
 }
@@ -18,6 +19,7 @@ interface AuthProps {
 const AuthContext = createContext<AuthProps>({
     authState: {
         token: null,
+        userId: null,
         authenticated: false,
         eventList: [],
         locationList: [],
@@ -35,6 +37,7 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [authState, setAuthState] = useState<AuthState>({
         token: null,
+        userId: null,
         authenticated: false,
         eventList: [],
         locationList: [],

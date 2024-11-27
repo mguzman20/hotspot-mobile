@@ -1,3 +1,4 @@
+
 import FontAwesome from '@expo/vector-icons/FontAwesome';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
@@ -60,6 +61,26 @@ export default function TabLayout() {
               ),
             }}
         />
+        {/* <Tabs.Screen
+            name="Notifications"
+            options={{
+            tabBarLabel: "Notificaciones",
+            title: "Notificaciones",
+            tabBarIcon: ({ color }) => (
+                <AntDesign name="notification" size={24} color={color} />
+              ),
+            }}
+        />
+        <Tabs.Screen
+            name="Menu"
+            options={{
+            tabBarLabel: "Menu",
+            title: "Menu",
+            tabBarIcon: ({ color }) => (
+                <AntDesign name="menufold" size={24} color={color} />
+              ),
+            }}
+        />   */}
     </Tabs>
   );
 }

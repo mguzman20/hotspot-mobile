@@ -5,11 +5,11 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { useAuth } from '../context/AuthContext';
 import { CampusEvent, fetchEvents } from '../helpers/backend';
 import { set } from 'react-hook-form';
-import { capitalize } from '../helpers/util';
+import { capitalize, formatDate } from '../helpers/util';
 
 type RootStackParamList = {
     Events: undefined;
-    EventDetail: { event: CampusEvent };
+    EventDetail: { eventId: string };
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
@@ -45,7 +45,7 @@ export default function Events() {
     };
 
     const handleCardPress = (event: CampusEvent) => {
-        navigation.navigate('EventDetail', { event });
+        navigation.navigate('EventDetail', { eventId: event._id });
     };
 
     const onRefresh = useCallback(() => {
@@ -75,8 +75,16 @@ export default function Events() {
                             }}
                             resizeMode="cover"
                         />
-                        <Text style={styles.eventName}>{event.title}</Text>
-                        <Text style={styles.eventCategory}>{capitalize(event.category)}</Text>
+                        <View style={{ display: 'flex', flexDirection: 'column' }}>
+                            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Text style={styles.eventName}>{event.title}</Text>
+                                <Text style={styles.eventCategory}>{`${capitalize(event.category)}`}</Text>
+                            </View>
+                            <View style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                                <Text style={styles.eventCategory}>{formatDate(event.date)}</Text>
+                                <Text style={styles.eventCategory}>{`${event.points.length - event.negpoints.length} hotpoints`}</Text>
+                            </View>
+                        </View>
                     </View>
                 </TouchableOpacity>
             ))}
@@ -110,10 +118,12 @@ const styles = StyleSheet.create({
     eventName: {
         fontSize: 18,
         fontWeight: 'bold',
+        margin: 1,
         marginBottom: 8,
     },
     eventCategory: {
         fontSize: 14,
+        margin: 1,
         color: '#757575',
     },
     loadingContainer: {

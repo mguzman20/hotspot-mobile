@@ -12,8 +12,8 @@ import { capitalize } from '../helpers/util';
 type RootStackParamList = {
   CreationMenu: { initialRegion: Camera };
   Map: undefined;
-  EventDetail: { event: CampusEvent }
-  LocationDetail: { location: CampusLocation }
+  EventDetail: { eventId: string }
+  LocationDetail: { locationId: string }
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Map'>;
@@ -36,6 +36,7 @@ export default function CampusMap() {
   const [filterCategory, setCategory] = useState<string>('all');
   const [filteredSpots, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState<boolean>(false);
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
   const showCenterMarker = false;
@@ -80,7 +81,7 @@ export default function CampusMap() {
 
 
   const requestLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    requestLocationPermission()
     if (mapRef.current) {
       mapRef.current.setMapBoundaries(boundaries.northEast, boundaries.southWest)
     }
@@ -103,18 +104,41 @@ export default function CampusMap() {
     }
   };
 
+  const toggleSearchBar = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+  };
+
+  const toggleEvents = () => {
+  }
+
+  const toggleLocations = () => {
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.filterContainer}>
         <TouchableOpacity style={styles.button} onPress={toggleModal}>
-          <Text style={styles.buttonText}>Categorías</Text>
+          {/* Category Icon */}
+          <FontAwesome name="filter" size={24} color="white" />
         </TouchableOpacity>
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Filtrar eventos por nombre"
-          value={filterText}
-          onChangeText={setFilterText}
-        />
+        <TouchableOpacity style={styles.button} onPress={toggleSearchBar}>
+          <FontAwesome name="search" size={24} color="white" />
+        </TouchableOpacity>
+        {isSearchExpanded && (
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Filtrar eventos por nombre"
+            value={filterText}
+            onChangeText={setFilterText}
+          />
+        )}
+        {/* Button that says Events */}
+        <TouchableOpacity style={styles.button} onPress={toggleEvents}>
+          <Text style={styles.buttonText}>Eventos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={toggleLocations}>
+          <Text style={styles.buttonText}>Locations</Text>
+        </TouchableOpacity>
       </View>
       <Modal
         visible={isModalVisible}
@@ -153,9 +177,9 @@ export default function CampusMap() {
             onCalloutPress={() => {
               console.log("callout press")
               if ("date" in spot) {
-                navigation.navigate("EventDetail", { event: spot })
+                navigation.navigate("EventDetail", { eventId: spot._id })
               } else {
-                navigation.navigate("LocationDetail", { location: spot })
+                navigation.navigate("LocationDetail", { locationId: spot._id })
               }
             }}
             onSelect={() => {

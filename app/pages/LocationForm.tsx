@@ -7,6 +7,7 @@ import MapView, { Camera, Marker, Region, PROVIDER_GOOGLE } from 'react-native-m
 import { zodResolver } from '@hookform/resolvers/zod';
 import { styles } from '../styles/styles';
 import DropDownPicker from 'react-native-dropdown-picker';
+import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
 import { useAuth } from '../context/AuthContext';
 import { useNavigation } from '@react-navigation/native';
@@ -112,7 +113,20 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                     )}
                 />
                 {errors.title?.message && <Text style={styles.error}>{String(errors.title.message)}</Text>}
+                <Button title="Seleccionar imagen" onPress={async () => {
+                    const result = await ImagePicker.launchImageLibraryAsync({
+                        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+                        allowsEditing: true,
+                        aspect: [4, 3],
+                        quality: 1,
+                    });
 
+                    // if (!result.canceled) {
+                    //     console.log(result.uri);
+                    //     setValue('image', result.uri);
+                    // }
+                }
+                } />
                 <Text style={styles.label}>Descripción</Text>
                 <Controller
                     control={control}

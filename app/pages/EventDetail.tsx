@@ -1,18 +1,52 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-native';
-import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
-import { CampusEvent } from '../helpers/backend';
-import { capitalize } from '../helpers/util';
 
-export default function EventDetail({ route }: { route?: { params: { event: CampusEvent } } }) {
+import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
+import { backendFetch, CampusEvent } from '../helpers/backend';
+import { capitalize, formatDate } from '../helpers/util';
+import { FontAwesome } from '@expo/vector-icons';
+import { useAuth } from '../context/AuthContext';
+
+export default function EventDetail({ route }: { route?: { params: { eventId: string } } }) {
     if (route == null) return <></>
-    const { event } = route.params;
+    const { authState, reloadSpots } = useAuth()
+    const { eventId } = route.params;
+    const event = authState.eventList.find((ev) => ev._id === eventId)
+    if (event == null) return <></>
+
+    const hasLike = event.points.includes(authState.userId ?? '')
+    const hasDislike = event.negpoints.includes(authState.userId ?? '')
+    const unauth = !authState.userId
+
+    console.log("event details: ", event)
+    console.log("user id", authState.userId)
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)
     useEffect(() => {
         setTimeout(() => setShowMap(true), 1000)
     }, [])
+
+    const onLikeChange = async (like: boolean) => {
+        if (unauth) {
+            Alert.alert("Inicia sesión para entregar y quitar hotpoints!")
+            return
+        }
+        console.log('liking ', event._id)
+        await backendFetch({
+            route: `/events/${like ? 'like' : 'dislike'}`,
+            method: 'POST',
+            token: authState.token,
+            body: {
+                eventId: event._id,
+            },
+            handleErr: {
+                alertTitle: `${like ? 'Like' : 'Dislike'} failed`,
+            },
+            rawResponse: true,
+        })
+        await reloadSpots()
+    }
 
     return (
         <ScrollView style={styles.container}>
@@ -25,6 +59,34 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
             />
             <Text style={styles.eventName}>{event.title}</Text>
             <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
+            <Text style={styles.eventCategory}>Inicio: {formatDate(event.date)}</Text>
+
+            <View style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
+                marginBottom: 16,
+            }}>
+                <TouchableOpacity onPress={() => {
+                    onLikeChange(true)
+                }}>
+                    <FontAwesome name="thumbs-up" color={unauth ? 'lightgray' : hasLike ? 'green' : 'gray'} size={40} style={{
+                        margin: 10,
+                    }} />
+                </TouchableOpacity>
+                <View style={{ width: 100, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+                    <Text style={{ textAlignVertical: 'center', fontSize: 32, margin: 1 }}>
+                        {event.points.length - event.negpoints.length}
+                    </Text>
+                </View>
+                <TouchableOpacity onPress={() => {
+                    onLikeChange(false)
+                }}>
+                    <FontAwesome name="thumbs-down" color={unauth ? 'lightgray' : hasDislike ? 'red' : 'gray'} size={40} style={{
+                        margin: 10,
+                    }} />
+                </TouchableOpacity>
+            </View>
 
             {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
