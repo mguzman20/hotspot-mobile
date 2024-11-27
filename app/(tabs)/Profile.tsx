@@ -9,7 +9,7 @@ export default function Tab() {
 
 
   const handleLogout = () => {
-    setAuthState({ token: '', authenticated: false });
+    setAuthState(state => ({ ...state, token: '', authenticated: false }));
     router.replace('/(tabs)/Home');
     Alert.alert('Sucess', 'Logged Out!');
   }
