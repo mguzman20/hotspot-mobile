@@ -12,10 +12,12 @@ export type CampusBase = {
 }
 
 export type CampusEvent = CampusBase & {
+    eventId: string;
     date: Date;
 };
 
 export type CampusLocation = CampusBase & {
+    locationId: string;
     score: Number;
 }
 
