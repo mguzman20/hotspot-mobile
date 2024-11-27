@@ -34,6 +34,7 @@ export default function CampusMap() {
   const [filterCategory, setCategory] = useState<string>('all');
   const [filteredEvents, setFilteredEvents] = useState<CampusSpot[]>([]);
   const [isModalVisible, setIsModalVisible] = useState<boolean>(false);
+  const [isSearchExpanded, setIsSearchExpanded] = useState<boolean>(false);
   const { authState, reloadSpots: reloadEvents } = useAuth()
   const navigation = useNavigation<EventsNavigationProp>();
   const showMarker = false;
@@ -78,7 +79,7 @@ export default function CampusMap() {
 
 
   const requestLocation = async () => {
-    const { status } = await Location.requestForegroundPermissionsAsync();
+    requestLocationPermission()
     if (mapRef.current) {
       mapRef.current.setMapBoundaries(boundaries.northEast, boundaries.southWest)
     }
@@ -101,18 +102,41 @@ export default function CampusMap() {
     }
   };
 
+  const toggleSearchBar = () => {
+    setIsSearchExpanded(!isSearchExpanded);
+  };
+
+  const toggleEvents = () => {
+  }
+
+  const toggleLocations = () => {
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.filterContainer}>
         <TouchableOpacity style={styles.button} onPress={toggleModal}>
-          <Text style={styles.buttonText}>Categorías</Text>
+          {/* Category Icon */}
+          <FontAwesome name="filter" size={24} color="white" />
         </TouchableOpacity>
-        <TextInput
-          style={[styles.input, { flex: 1 }]}
-          placeholder="Filtrar eventos por nombre"
-          value={filterText}
-          onChangeText={setFilterText}
-        />
+        <TouchableOpacity style={styles.button} onPress={toggleSearchBar}>
+          <FontAwesome name="search" size={24} color="white" />
+        </TouchableOpacity>
+        {isSearchExpanded && (
+          <TextInput
+            style={[styles.input, { flex: 1 }]}
+            placeholder="Filtrar eventos por nombre"
+            value={filterText}
+            onChangeText={setFilterText}
+          />
+        )}
+        {/* Button that says Events */}
+        <TouchableOpacity style={styles.button} onPress={toggleEvents}>
+          <Text style={styles.buttonText}>Eventos</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.button} onPress={toggleLocations}>
+          <Text style={styles.buttonText}>Locations</Text>
+        </TouchableOpacity>
       </View>
       <Modal
         visible={isModalVisible}
