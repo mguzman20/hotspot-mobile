@@ -41,6 +41,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
 
     const hasLike = event.points.includes(authState.userId ?? '')
     const hasDislike = event.negpoints.includes(authState.userId ?? '')
+    const unauth = !authState.userId
 
     return (
         <ScrollView style={styles.container}>
@@ -63,7 +64,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                 <TouchableOpacity disabled={!authState.userId} onPress={() => {
                     onLikeChange(true)
                 }}>
-                    <FontAwesome name="thumbs-up" color={hasLike ? 'green' : 'gray'} size={40} style={{
+                    <FontAwesome name="thumbs-up" color={unauth ? 'lightgray' : hasLike ? 'green' : 'gray'} size={40} style={{
                         margin: 10,
                     }} />
                 </TouchableOpacity>
@@ -75,7 +76,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                 <TouchableOpacity disabled={!authState.userId} onPress={() => {
                     onLikeChange(false)
                 }}>
-                    <FontAwesome name="thumbs-down" color={hasDislike ? 'red' : 'gray'} size={40} style={{
+                    <FontAwesome name="thumbs-down" color={unauth ? 'lightgray' : hasDislike ? 'red' : 'gray'} size={40} style={{
                         margin: 10,
                     }} />
                 </TouchableOpacity>
