@@ -12,7 +12,7 @@ export default function EventDetail({ route }: { route?: { params: { event: Camp
             <Image
                 style={styles.imagePlaceholder}
                 source={{
-                    uri: event.img ? event.img : 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
+                    uri: event.img ? event.img : 'https://www.ing.puc.cl/wp-content/uploads/2014/06/10.jpg',
                 }}
                 resizeMode="cover"
             />

@@ -16,7 +16,7 @@ export type CampusEvent = CampusSpot & {
 };
 
 export type CampusLocation = CampusSpot & {
-    score: Number;
+    score: number;
 }
 
 export async function fetchEvents(token: string | null): Promise<CampusEvent[]> {

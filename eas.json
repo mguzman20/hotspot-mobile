@@ -1,0 +1,33 @@
+{
+  "cli": {
+    "version": ">= 12.6.2",
+    "appVersionSource": "remote"
+  },
+  "build": {
+    "development": {
+      "developmentClient": true,
+      "distribution": "internal",
+      "env": {
+        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
+      }
+    },
+    "preview": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
+      }
+    },
+    "production": {
+      "autoIncrement": true,
+      "env": {
+        "EXPO_PUBLIC_API_URL":"https://ioslnr3j5f.execute-api.us-east-2.amazonaws.com"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

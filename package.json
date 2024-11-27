@@ -4,11 +4,12 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "tunnel": "expo start --tunnel",
+    "tunnel": "expo start --tunnel -c",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "lint": "eslint . --fix"
   },
   "jest": {
     "preset": "jest-expo"

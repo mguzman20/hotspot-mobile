@@ -71,7 +71,7 @@ export default function Events() {
                         <Image
                             style={styles.imagePlaceholder}
                             source={{
-                                uri: 'https://www.dondeir.com/wp-content/uploads/2016/07/helados1.jpg',
+                                uri: 'https://www.ing.puc.cl/wp-content/uploads/2014/06/10.jpg',
                             }}
                             resizeMode="cover"
                         />
