@@ -82,10 +82,39 @@ export default function Reviews({ reviews, locationID }: ReviewsProps) {
                 </View>
             ))}
         </View>
+        <Modal
+                isVisible={isModalVisible}
+                onBackdropPress={toggleModal}
+                swipeDirection="down"
+                style={styles.modal}
+            >
+                <View style={styles.modalContent}>
+                    <Text style={styles.modalTitle}>Write a Review</Text>
+
+                    <View style={styles.ratingContainer}>
+                        {[1, 2, 3, 4, 5].map((rating) => (
+                            <TouchableOpacity key={rating} onPress={() => setNewReview({ ...newReview, rating })}>
+                                <Text style={newReview.rating >= rating ? styles.selectedStar : styles.star}>
+                                    ★
+                                </Text>
+                            </TouchableOpacity>
+                        ))}
+                    </View>
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Write your comment..."
+                        multiline
+                        onChangeText={(text) => setNewReview({ ...newReview, comment: text })}
+                    />
+
+                    <Button title="Submit Review" onPress={handleSubmitReview} />
+                </View>
+            </Modal>
 
         {/* Button to add a review */}
         <View style={styles.buttonContainer}>
-            <Button title="Write a Review" onPress={() => console.log('Navigate to review form')} />
+            <Button title="Write a Review" onPress={toggleModal} />
         </View>
 
         {/* Individual Reviews */}
@@ -169,5 +198,40 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#757575',
     },
+    modal: {
+        justifyContent: 'flex-end',
+        margin: 0,
+    },
+    modalContent: {
+        backgroundColor: 'white',
+        padding: 20,
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+    },
+    modalTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        marginBottom: 16,
+    },
+    ratingContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 16,
+    },
+    star: {
+        fontSize: 32,
+        color: '#e0e0e0',
+    },
+    selectedStar: {
+        fontSize: 32,
+        color: '#ffd700',
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        padding: 10,
+        borderRadius: 8,
+        marginBottom: 16,
+    }
 });
 
