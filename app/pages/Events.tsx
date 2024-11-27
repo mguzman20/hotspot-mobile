@@ -9,7 +9,7 @@ import { capitalize } from '../helpers/util';
 
 type RootStackParamList = {
     Events: undefined;
-    EventDetail: { event: CampusEvent };
+    EventDetail: { eventId: string };
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Events'>;
@@ -45,7 +45,7 @@ export default function Events() {
     };
 
     const handleCardPress = (event: CampusEvent) => {
-        navigation.navigate('EventDetail', { event });
+        navigation.navigate('EventDetail', { eventId: event._id });
     };
 
     const onRefresh = useCallback(() => {

@@ -3,10 +3,14 @@ import { View, Text, StyleSheet, ScrollView, Image, Dimensions } from 'react-nat
 import MapView, { Marker } from 'react-native-maps';
 import { CampusEvent, CampusLocation } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { useAuth } from '../context/AuthContext';
 
-export default function LocationDetail({ route }: { route?: { params: { location: CampusLocation } } }) {
+export default function LocationDetail({ route }: { route?: { params: { locationId: string } } }) {
     if (route == null) return <></>
-    const { location } = route.params;
+    const { authState } = useAuth();
+    const { locationId } = route.params;
+    const location = authState.locationList.find((loc) => loc._id === locationId)
+    if (location == null) return <></>
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)

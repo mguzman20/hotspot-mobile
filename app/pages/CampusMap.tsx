@@ -12,8 +12,8 @@ import { capitalize } from '../helpers/util';
 type RootStackParamList = {
   CreationMenu: { initialRegion: Camera };
   Map: undefined;
-  EventDetail: { event: CampusEvent }
-  LocationDetail: { location: CampusLocation }
+  EventDetail: { eventId: string }
+  LocationDetail: { locationId: string }
 };
 
 type EventsNavigationProp = StackNavigationProp<RootStackParamList, 'Map'>;
@@ -153,9 +153,9 @@ export default function CampusMap() {
             onCalloutPress={() => {
               console.log("callout press")
               if ("date" in spot) {
-                navigation.navigate("EventDetail", { event: spot })
+                navigation.navigate("EventDetail", { eventId: spot._id })
               } else {
-                navigation.navigate("LocationDetail", { location: spot })
+                navigation.navigate("LocationDetail", { locationId: spot._id })
               }
             }}
             onSelect={() => {
