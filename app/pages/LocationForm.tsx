@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert } from 'react-native';
+import { View, Text, TextInput, Button, StyleSheet, ScrollView, Alert, Image } from 'react-native';
 import { useForm, Controller } from 'react-hook-form';
 import { z } from 'zod';
 import MapView, { Camera, Marker, Region, PROVIDER_GOOGLE } from 'react-native-maps';
@@ -14,6 +14,7 @@ import { useNavigation } from '@react-navigation/native';
 import { CATEGORIES } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';   
 
 const formSchema = z.object({
     coordinates: z.object({
@@ -45,49 +46,89 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
         northEast: { latitude: -33.495314, longitude: -70.604986 },
         southWest: { latitude: -33.501466, longitude: -70.616074 },
     }
-
+    
     const defaultRegion: Region = {
         latitude: (boundaries.southWest.latitude + boundaries.northEast.latitude) / 2,
         longitude: (boundaries.southWest.longitude + boundaries.northEast.longitude) / 2,
         latitudeDelta: boundaries.northEast.latitude - boundaries.southWest.latitude,
         longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude
     };
-
+    
     const [region, setRegion] = useState(defaultRegion);
+    
+    const [image, setImage] = useState<string | null>(null);
+
+    const pickImage = async () => {
+        try {
+            const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+            if (status !== 'granted') {
+                Alert.alert('Permiso denegado', 'Se requiere acceso a la galería para seleccionar una imagen.');
+                return;
+            }
+    
+            const result = await ImagePicker.launchImageLibraryAsync({
+                mediaTypes: ['images'],
+                allowsEditing: true,
+                quality: 1,
+            });
+    
+            if (!result.canceled) {
+                setImage(result.assets[0].uri);
+            }
+        } catch (error) {
+            console.error('Error al seleccionar la imagen:', error);
+            Alert.alert('Error', 'No se pudo seleccionar la imagen. Por favor, intenta nuevamente.');
+        }
+    };
+    
 
     const onSubmit = async (data: any) => {
         console.log(data);
-
-        // Send the data to the API
-
+    
         try {
+            const fileType = image?.split('.').pop(); // Obtén el tipo de archivo si hay imagen
+    
             const response = await fetch(process.env.EXPO_PUBLIC_API_URL + '/locations', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${authState.token}`,
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify({
+                    ...data,
+                    fileType: image ? `image/${fileType}` : null, // Solo incluye el tipo si hay imagen
+                }),
             });
-
+    
             if (response.ok) {
-                // Redirect to the event page
+                const { imageUrl } = await response.json();
+    
+                if (image && fileType) {
+                    // Solo sube la imagen si existe
+                    await fetch(imageUrl, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': `image/${fileType}`,
+                        },
+                        body: await fetch(image).then((res) => res.blob()),
+                    });
+                }
+    
                 Alert.alert('Ubicación creada exitosamente');
                 console.log('created location', data);
                 navigation.goBack();
                 reloadSpots();
             } else {
-                // Display an error message
                 console.error('Failed to create location');
                 const error = await response.json();
                 console.error(error);
-            };
+            }
         } catch (error) {
             console.error('Failed to create location');
             console.error(error);
         }
-
     };
+    
 
     // Handle the map press to set coordinates
     const onRegionChange = (newRegion: { latitude: number, longitude: number, latitudeDelta: number, longitudeDelta: number }) => {
@@ -166,6 +207,10 @@ export default function LocationForm({ route }: { route?: { params: LocationForm
                     )}
                 />
                 {errors.category && <Text style={styles.error}>{String(errors.category.message)}</Text>}
+
+                <Text style={styles.label}>Imagen</Text>
+                <Button title="Seleccionar imagen" onPress={pickImage} />
+                {image && <Image source={{ uri: image }} style={{ width: 200, height: 200 }} />}
 
                 <Text style={styles.label}>Ubicacion</Text>
                 <View style={{
