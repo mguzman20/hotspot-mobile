@@ -213,6 +213,7 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
                     marginVertical: 10,
                 }}>
                     <MapView
+                        provider={PROVIDER_GOOGLE}
                         style={{
                             width: '100%',
                             height: 300,

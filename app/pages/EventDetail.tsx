@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
+
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { backendFetch, CampusEvent } from '../helpers/backend';
 import { capitalize, formatDate } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
@@ -90,6 +91,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
             {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
                 {showMap && <MapView
+                    provider={PROVIDER_GOOGLE}
                     style={styles.map}
                     initialRegion={{
                         latitude: event.coordinates.latitude,
