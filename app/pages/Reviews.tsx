@@ -1,5 +1,8 @@
-import React from 'react';
-import { View, Text, ScrollView, StyleSheet, Button } from 'react-native';
+import React, {useEffect, useState} from 'react';
+import { View, Text, ScrollView, StyleSheet, Button, TouchableOpacity, TextInput } from 'react-native';
+import Modal from 'react-native-modal';
+import { useAuth } from '../context/AuthContext';
+
 
 // Dummy data for reviews
 const reviewsData = [
@@ -21,10 +24,45 @@ interface Review {
 
 interface ReviewsProps {
     reviews: Review[];
+    locationID: string;
 }
 
+export default function Reviews({ reviews, locationID }: ReviewsProps) {
 
-const Reviews: React.FC<ReviewsProps> = ({ reviews }) => (
+    const [isModalVisible, setModalVisible] = useState(false);
+    const [newReview, setNewReview] = useState({ rating: 0, comment: '' });
+    const { authState, reloadSpots } = useAuth();
+
+
+    const toggleModal = () => {
+        setModalVisible(!isModalVisible);
+    };
+
+    useEffect(() => {
+        console.log(reviews)
+        console.log(locationID)
+    }
+    , []);
+
+
+    const handleSubmitReview = async (data: any) => {
+        try {
+            const response = await fetch(process.env.EXPO_PUBLIC_API_URL + `/locationreviews/${locationID}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authState.token}`,
+                },
+                body: JSON.stringify(data),
+            });
+            console.log(response)
+            // fetchReviews(); // Refresh reviews after submission
+        } catch (error) {
+            console.error('Error submitting review:', error);
+        }
+    };
+
+    return(
     <ScrollView style={styles.tabContainer}>
         {/* Review Summary */}
         <Text style={styles.sectionTitle}>Reviews Summary</Text>
@@ -64,7 +102,8 @@ const Reviews: React.FC<ReviewsProps> = ({ reviews }) => (
             <Text style={styles.eventDescription}>No reviews yet.</Text>
         )}
     </ScrollView>
-);
+    )
+}
 
 const styles = StyleSheet.create({
     tabContainer: {
@@ -132,4 +171,3 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Reviews;

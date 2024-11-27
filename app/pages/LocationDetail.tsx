@@ -5,6 +5,8 @@ import Reviews from './Reviews';
 import { TabView, SceneMap, TabBar } from 'react-native-tab-view';
 import { CampusEvent, CampusLocation } from '../helpers/backend';
 import { capitalize } from '../helpers/util';
+import { backendFetch } from '../helpers/backend';
+import { useAuth } from '../context/AuthContext';
 
 interface Review {
     title: string;
@@ -18,6 +20,8 @@ interface Review {
 export default function LocationDetail({ route }: { route?: { params: { location: CampusLocation } } }) {
     if (route == null) return <></>
     const { location } = route.params;
+    const { authState, reloadSpots } = useAuth()
+
 
     // HACK: expo 52 qlo
     const [showMap, setShowMap] = useState(false)
@@ -38,10 +42,14 @@ export default function LocationDetail({ route }: { route?: { params: { location
     // Fetch reviews
     useEffect(() => {
         console.log('fetching reviews')
-        fetch(process.env.EXPO_PUBLIC_API_URL + `/locationreviews/${location._id}`)
-            .then((response) => response.json())
-            .then((data) => setReviews(data))
-            .catch((error) => console.error(error));
+        backendFetch({
+            route: `/locationreviews/${location._id}`,
+            method: 'POST',
+            token: authState.token,
+            body: {
+            },
+            rawResponse: true,
+        })
         console.log(reviews)
     }, []);
 
@@ -84,7 +92,9 @@ export default function LocationDetail({ route }: { route?: { params: { location
 
     
     const ReviewsTab = () => (
-        <Reviews reviews={reviews}/>
+        <Reviews 
+            reviews={reviews}
+            locationID={location._id}/>
     );
 
     const About = () => (
