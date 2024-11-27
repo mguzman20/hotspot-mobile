@@ -13,6 +13,10 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
     const event = authState.eventList.find((ev) => ev._id === eventId)
     if (event == null) return <></>
 
+    const hasLike = event.points.includes(authState.userId ?? '')
+    const hasDislike = event.negpoints.includes(authState.userId ?? '')
+    const unauth = !authState.userId
+
     console.log("event details: ", event)
     console.log("user id", authState.userId)
 
@@ -23,6 +27,10 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
     }, [])
 
     const onLikeChange = async (like: boolean) => {
+        if (unauth) {
+            Alert.alert("Inicia sesión para entregar y quitar hotpoints!")
+            return
+        }
         console.log('liking ', event._id)
         await backendFetch({
             route: `/events/${like ? 'like' : 'dislike'}`,
@@ -38,10 +46,6 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
         })
         await reloadSpots()
     }
-
-    const hasLike = event.points.includes(authState.userId ?? '')
-    const hasDislike = event.negpoints.includes(authState.userId ?? '')
-    const unauth = !authState.userId
 
     return (
         <ScrollView style={styles.container}>
@@ -62,7 +66,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                 justifyContent: 'flex-start',
                 marginBottom: 16,
             }}>
-                <TouchableOpacity disabled={!authState.userId} onPress={() => {
+                <TouchableOpacity onPress={() => {
                     onLikeChange(true)
                 }}>
                     <FontAwesome name="thumbs-up" color={unauth ? 'lightgray' : hasLike ? 'green' : 'gray'} size={40} style={{
@@ -74,7 +78,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                         {event.points.length - event.negpoints.length}
                     </Text>
                 </View>
-                <TouchableOpacity disabled={!authState.userId} onPress={() => {
+                <TouchableOpacity onPress={() => {
                     onLikeChange(false)
                 }}>
                     <FontAwesome name="thumbs-down" color={unauth ? 'lightgray' : hasDislike ? 'red' : 'gray'} size={40} style={{
