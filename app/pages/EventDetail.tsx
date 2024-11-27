@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
+
 import { View, Text, StyleSheet, ScrollView, Image, Dimensions, TouchableOpacity, Alert } from 'react-native';
-import MapView, { Marker } from 'react-native-maps';
+import MapView, { Marker, PROVIDER_GOOGLE } from 'react-native-maps';
 import { backendFetch, CampusEvent } from '../helpers/backend';
-import { capitalize } from '../helpers/util';
+import { capitalize, formatDate } from '../helpers/util';
 import { FontAwesome } from '@expo/vector-icons';
 import { useAuth } from '../context/AuthContext';
 
@@ -12,6 +13,10 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
     const { eventId } = route.params;
     const event = authState.eventList.find((ev) => ev._id === eventId)
     if (event == null) return <></>
+
+    const hasLike = event.points.includes(authState.userId ?? '')
+    const hasDislike = event.negpoints.includes(authState.userId ?? '')
+    const unauth = !authState.userId
 
     console.log("event details: ", event)
     console.log("user id", authState.userId)
@@ -23,6 +28,10 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
     }, [])
 
     const onLikeChange = async (like: boolean) => {
+        if (unauth) {
+            Alert.alert("Inicia sesión para entregar y quitar hotpoints!")
+            return
+        }
         console.log('liking ', event._id)
         await backendFetch({
             route: `/events/${like ? 'like' : 'dislike'}`,
@@ -39,10 +48,6 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
         await reloadSpots()
     }
 
-    const hasLike = event.points.includes(authState.userId ?? '')
-    const hasDislike = event.negpoints.includes(authState.userId ?? '')
-    const unauth = !authState.userId
-
     return (
         <ScrollView style={styles.container}>
             <Image
@@ -54,6 +59,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
             />
             <Text style={styles.eventName}>{event.title}</Text>
             <Text style={styles.eventCategory}>Categoría: {capitalize(event.category)}</Text>
+            <Text style={styles.eventCategory}>Inicio: {formatDate(event.date)}</Text>
 
             <View style={{
                 display: 'flex',
@@ -61,7 +67,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                 justifyContent: 'flex-start',
                 marginBottom: 16,
             }}>
-                <TouchableOpacity disabled={!authState.userId} onPress={() => {
+                <TouchableOpacity onPress={() => {
                     onLikeChange(true)
                 }}>
                     <FontAwesome name="thumbs-up" color={unauth ? 'lightgray' : hasLike ? 'green' : 'gray'} size={40} style={{
@@ -73,7 +79,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
                         {event.points.length - event.negpoints.length}
                     </Text>
                 </View>
-                <TouchableOpacity disabled={!authState.userId} onPress={() => {
+                <TouchableOpacity onPress={() => {
                     onLikeChange(false)
                 }}>
                     <FontAwesome name="thumbs-down" color={unauth ? 'lightgray' : hasDislike ? 'red' : 'gray'} size={40} style={{
@@ -85,6 +91,7 @@ export default function EventDetail({ route }: { route?: { params: { eventId: st
             {/* Mapa con marcador en la ubicación del evento */}
             <View style={styles.mapContainer}>
                 {showMap && <MapView
+                    provider={PROVIDER_GOOGLE}
                     style={styles.map}
                     initialRegion={{
                         latitude: event.coordinates.latitude,
