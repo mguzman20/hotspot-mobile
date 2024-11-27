@@ -52,8 +52,6 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
         longitudeDelta: boundaries.northEast.longitude - boundaries.southWest.longitude
     };
 
-    console.log("initial region eventform", route?.params.initialRegion)
-
     const onSubmit = async (data: any) => {
         console.log(data);
 
@@ -164,7 +162,7 @@ export default function EventForm({ route }: { route?: { params: EventFormParams
                             height: 300,
                         }}
                         // initialRegion={defaultRegion}
-                        initialCamera={route?.params.initialRegion}
+                        initialCamera={route?.params?.initialRegion}
                         onRegionChange={onRegionChange}
                         showsUserLocation={true}
                     >
